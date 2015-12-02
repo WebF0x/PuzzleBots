@@ -1,4 +1,11 @@
 # PuzzleBots
 Solve various puzzles on the Internet
 
-[Light Up](http://www.puzzle-light-up.com/)
+## Run in Firefox
+- Shift+F4 (Open Scratchpad)
+- Open file... -> [javascriptFileName.js]
+- Ctrl+R (run)
+
+## Puzzles
+
+- [Light Up](http://www.puzzle-light-up.com/)
