@@ -409,7 +409,3 @@ function findSingleReachable(x,y)
   
   return position;
 }
-
-/*
-Exception: [Exception... "Component is not available"  nsresult: "0x80040111 (NS_ERROR_NOT_AVAILABLE)"  location: "JS frame :: Scratchpad/2 :: solveFreeCell :: line 120"  data: no]
-*/
