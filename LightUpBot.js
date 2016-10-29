@@ -57,13 +57,11 @@ function solve()
   {
     for(var y=0; y<DIMENSION; y++)
     {
-      //progressWasMade = solveCell(x,y) || progressWasMade;
-      if(solveCell(x,y)) return true;
+      progressWasMade = solveCell(x,y) || progressWasMade;
     }
   }
   
-  return false;
-  //return progressWasMade;
+  return progressWasMade;
 }
 
 //Return true is progress was made
