@@ -110,6 +110,49 @@ function solveNumberedCell(x,y,numberOfAdditionalBulbsRequired)
       break;  
   }
   
+  return progressWasMade || markCornersOfNumberedCellThatCannotBeBulbAsX(x,y);
+}
+
+//For a numbered cell at position x,y
+//If it cannot be a bulb, mark it as X
+//Return true if progress was made
+function markCornersOfNumberedCellThatCannotBeBulbAsX(x,y)
+{
+  if(freeNeighborCount(x,y) != getNumberOfAdditionalBulbsRequired(x,y) + 1)
+    return false;
+  
+  return markFreeCornersWithX(x,y);
+}
+
+//Mark all free corners that are part of a free corner trio
+//Return true if at least one valid free corner was found and marked
+//Return false otherwise
+//Example: The bottom left corner is a free corner trio.
+//The "?" cell would be marked as X
+// _x_|_x_|_x_
+// ___|_1_|_x_
+//  ? |   | x
+function markFreeCornersWithX(x,y)
+{
+  var progressWasMade = false;
+  
+  if(isFree(x-1,y-1) && isFree(x-1,y) && isFree(x,y-1))
+  {
+    progressWasMade = setX(x-1,y-1) || progressWasMade;
+  }
+  if(isFree(x+1,y-1) && isFree(x+1,y) && isFree(x,y-1))
+  {
+    progressWasMade = setX(x+1,y-1) || progressWasMade;
+  }
+  if(isFree(x-1,y+1) && isFree(x-1,y) && isFree(x,y+1))
+  {
+    progressWasMade = setX(x-1,y+1) || progressWasMade;
+  }
+  if(isFree(x+1,y+1) && isFree(x+1,y) && isFree(x,y+1))
+  {
+    progressWasMade = setX(x+1,y+1) || progressWasMade;
+  }
+  
   return progressWasMade;
 }
 
