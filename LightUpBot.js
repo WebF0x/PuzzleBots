@@ -69,8 +69,8 @@ function solveCell(x,y)
 {
   if(!isValid(x,y)) return false;
   
-  var number = getNumber(x,y);
-  if( !isNaN(number) ) return solveNumberedCell(x,y,number);
+  var numberOfAdditionalBulbsRequired = getNumberOfAdditionalBulbsRequired(x,y);
+  if( !isNaN(numberOfAdditionalBulbsRequired) ) return solveNumberedCell(x,y,numberOfAdditionalBulbsRequired);
   
   if( isFree(x,y) ) return solveFreeCell(x,y);
   if( isDarkX(x,y) ) return solveDarkXCell(x,y);
@@ -79,11 +79,11 @@ function solveCell(x,y)
 }
 
 //Return true if progress was made
-function solveNumberedCell(x,y,number)
+function solveNumberedCell(x,y,numberOfAdditionalBulbsRequired)
 {
   var progressWasMade = false;
   
-  if(number == 3)
+  if(numberOfAdditionalBulbsRequired == 3)
   {
     progressWasMade = setX(x-1, y-1)   || progressWasMade;
     progressWasMade = setX(x-1, y+1)   || progressWasMade;
@@ -91,7 +91,7 @@ function solveNumberedCell(x,y,number)
     progressWasMade = setX(x+1, y+1)   || progressWasMade;
   }
   
-  switch(number)
+  switch(numberOfAdditionalBulbsRequired)
   {
     case 0:
       progressWasMade = setX(x-1, y)   || progressWasMade;
@@ -101,7 +101,7 @@ function solveNumberedCell(x,y,number)
       break;    
 
     default:
-      if(number != freeNeighborCount(x,y)) break;
+      if(numberOfAdditionalBulbsRequired != freeNeighborCount(x,y)) break;
 
       progressWasMade = setBulb(x-1, y)   || progressWasMade;
       progressWasMade = setBulb(x+1, y)   || progressWasMade;
@@ -137,7 +137,7 @@ function setXifBulbBlocksNumber(x,y)
   setImg(sender, "y");
   initCells();
   
-  if(freeNeighborCount(x,y) < getNumber(x,y)) return true;
+  if(freeNeighborCount(x,y) < getNumberOfAdditionalBulbsRequired(x,y)) return true;
   
   if(unsolvableNumberedCellFound() == 1)//cell has too few free neighbors
   {
@@ -168,11 +168,11 @@ function unsolvableNumberedCellFound()
   {
     for(var y=0; y<DIMENSION; y++)
     {
-      var number = getNumber(x,y);
-      if( isNaN(number) ) continue;
+      var numberOfAdditionalBulbsRequired = getNumberOfAdditionalBulbsRequired(x,y);
+      if( isNaN(numberOfAdditionalBulbsRequired) ) continue;
     
-      if(freeNeighborCount(x,y) < number) return 1;
-      if(number < 0) return 2;
+      if(freeNeighborCount(x,y) < numberOfAdditionalBulbsRequired) return 1;
+      if(numberOfAdditionalBulbsRequired < 0) return 2;
     }
   }
   
@@ -265,7 +265,14 @@ function getNumber(x,y)
   var number = Number( cells[x][y][2] );
   if( isNaN(number) ) return Number.NaN;
   
-  return number-getBulbCount(x,y);
+  return number
+}
+
+//Return number of additional bulbs required around a number
+//If cell is not a number, return Number.NaN
+function getNumberOfAdditionalBulbsRequired(x,y)
+{  
+  return getNumber(x,y) - getBulbCount(x,y);
 }
 
 //Return true if cell is free, false otherwise
