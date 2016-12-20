@@ -9,31 +9,37 @@
    - Light bulbs can only be placed in unlit cells
 */
 
-var DIMENSION = Number(h);
-var cells;
-
 (function main()
-{
+{  
+  initCells2DArray();
+  initParseHTML();
+  
   do
   {
     initCells();
   } while( solve() );
 })();
 
-function initCells()
+function initParseHTML()
 {
   var tableElement = document.getElementById("LightUpTable");
   var tableBody = tableElement.getElementsByTagName("tbody")[0];
-  var tableRows = tableBody.getElementsByTagName("tr");
+  tableRows = tableBody.getElementsByTagName("tr");
+}
+
+function initCells2DArray()
+{
+  DIMENSION = Number(h);
   
-  //Create 2D array of cells
-  cells = new Array( DIMENSION );
+  cells = new Array(DIMENSION);
   for(var i=0; i<DIMENSION; i++)
   {
     cells[i] = new Array(DIMENSION);
   }
-  
-  //Fill 2D array of cells
+}
+
+function initCells()
+{
   for(var y=0; y<DIMENSION; y++)
   {
     var tableCells = tableRows[y].getElementsByTagName("td");
@@ -47,35 +53,137 @@ function initCells()
   }
 }
 
+function initNonWallCell(x,y)
+{
+  var cellImageName = "l" + "_" + y + "_" + x;
+  var cellImage = document.getElementsByName(cellImageName)[0];
+  var imageBaseName = baseNameFromURL(cellImage.src);
+  cells[x][y] = imageBaseName;
+}
 //Solve as much as possible of the lightUp puzzle
 //Return true if progress was made
 function solve()
 {
-  var progressWasMade = false;
+  return solveNonFreeCells() || solveFreeCells();
+}
 
+function solveNonFreeCells()
+{
   for(var x=0; x<DIMENSION; x++)
   {
     for(var y=0; y<DIMENSION; y++)
     {
-      progressWasMade = solveCell(x,y) || progressWasMade;
+      if(solveNonFreeCell(x,y)) return true;
     }
   }
-  
-  return progressWasMade;
+}
+
+function solveFreeCells()
+{
+  for(var x=0; x<DIMENSION; x++)
+  {
+    for(var y=0; y<DIMENSION; y++)
+    {
+      if(solveFreeCell(x,y)) return true;
+    }
+  }
 }
 
 //Return true is progress was made
-function solveCell(x,y)
+function solveNonFreeCell(x,y)
 {
   if(!isValid(x,y)) return false;
+  
+  if( isDarkX(x,y) ) return solveDarkXCell(x,y);
   
   var numberOfAdditionalBulbsRequired = getNumberOfAdditionalBulbsRequired(x,y);
   if( !isNaN(numberOfAdditionalBulbsRequired) ) return solveNumberedCell(x,y,numberOfAdditionalBulbsRequired);
   
-  if( isFree(x,y) ) return solveFreeCell(x,y);
-  if( isDarkX(x,y) ) return solveDarkXCell(x,y);
+  return false;
+}
+
+//On dark empty cell at position x,y,
+//if placing a bulb would make another cell impossible to solve,
+//mark the cell as X
+//Return true if progress was made
+function ifCannotBeBulbMarkAsX(x,y)
+{
+  if(!isDarkEmpty(x,y)) return false;
+  
+  setBulb(x,y);
+  initCellsOfSameRowOrColumn(x,y);
+  
+  if(anotherCellIsUnsolvable(x,y))
+  {
+    forceSetX(x,y);
+    return true;
+  }
+  else
+  {
+    setEmpty(x,y);
+    initCellsOfSameRowOrColumn(x,y);
+    return false;
+  }
+}
+
+function initCellsOfSameRowOrColumn(x,y)
+{
+  //Self
+  initNonWallCell(x,y);
+  
+  //Check left
+  for(var i=x-1; !isWall(i,y); i--)
+  {
+    initNonWallCell(i,y);
+  }
+  
+  //Check right
+  for(var i=x+1; !isWall(i,y); i++)
+  {
+    initNonWallCell(i,y);
+  }
+  
+  //Check up
+  for(var j=y-1; !isWall(x,j); j--)
+  {
+    initNonWallCell(x,j);
+  }
+  
+  //Check down
+  for(var j=y+1; !isWall(x,j); j++)
+  {
+    initNonWallCell(x,j);
+  }
+}
+
+function forceSetX(x,y)
+{
+  var sender = document.getElementsByName("l_"+y+"_"+x)[0];
+  if(!sender) return false;
+  
+  setImg(sender, "x");  
+  return true;
+}
+
+function anotherCellIsUnsolvable(x,y)
+{
+  for(var i=0; i<DIMENSION; i++)
+  {
+    for(var j=0; j<DIMENSION; j++)
+    {
+      if(i!=x && j!=y && isDarkX(i,j) && !isReachable(i,j))
+      {
+        return true;
+      }
+    }
+  }
   
   return false;
+}
+
+function getImg(x,y)
+{
+  return document.getElementsByName("l_"+x+"_"+y)[0]["src"];
 }
 
 //Return true if progress was made
@@ -166,8 +274,8 @@ function solveFreeCell(x,y)
       return true;
     }
   }
-  return false;
-  return setXifBulbBlocksNumber(x,y);
+
+  return ifCannotBeBulbMarkAsX(x,y);
 }
 
 function setXifBulbBlocksNumber(x,y)
@@ -297,6 +405,17 @@ function setX(x,y)
   return true;
 }
 
+function setEmpty(x,y)
+{
+  if(isFree(x,y)) return false;
+  
+  var sender = document.getElementsByName("l_"+y+"_"+x)[0];
+  if(!sender) return false;
+  
+  setImg(sender, "n");  
+  return true;
+}
+
 //Return cell number or Number.NaN
 function getNumber(x,y)
 {
@@ -339,6 +458,20 @@ function isDarkX(x,y)
   if(!isValid(x,y)) return false;
   
   return ( cells[x][y] == "xd" );
+}
+
+function isDarkEmpty(x,y)
+{
+  if(!isValid(x,y)) return false;
+  
+  return isDark(x,y) && isFree(x,y)
+}
+
+function isDark(x,y)
+{
+  if(!isValid(x,y)) return false;
+  
+  return ( cells[x][y][1] == "d" );
 }
 
 //True if cell exists inside board dimension
