@@ -26,6 +26,7 @@ function run_all_tests()
   test_when_number_is_1_then_mark_all_sides_as_black();
   test_when_white_tile_between_two_numbers_then_mark_black();
   test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black();
+  test_when_black_tile_touches_only_one_white_tile_mark_it_black();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -85,6 +86,25 @@ function test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black()
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers touching by corner should be marked as black");
 }
 
+function test_when_black_tile_touches_only_one_white_tile_mark_it_black()
+{
+   var board = [
+      [W, 1, W],
+      [W, B, 2],
+      [W, 3, W]
+    ];
+  
+  var expected_solved_board = [
+      [W, 1, W],
+      [B, B, 2],
+      [W, 3, W]
+    ];
+  
+  var solved_board = solve_black_tiles_touching_only_one_white_tile(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When black tile touches only one white tile, it should be marked as black");
+}
+
 ///////////
 // Board //
 ///////////
@@ -96,6 +116,7 @@ function solve(board)
   solved_board = solve_tiles_numbered_1(solved_board);
   solved_board = solve_white_tiles_between_numbers(solved_board);
   solved_board = solve_numbers_touching_by_corners(solved_board);
+  solved_board = solve_black_tiles_touching_only_one_white_tile(solved_board);
   
   return solved_board;
 }
@@ -175,6 +196,37 @@ function solve_numbers_touching_by_corners(board)
   return board;
 }
 
+function solve_black_tiles_touching_only_one_white_tile(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_black_board_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      var number_of_white_tiles_touched = 0;
+      if(is_white_board_tile(board, i-1, j)) number_of_white_tiles_touched++;
+      if(is_white_board_tile(board, i+1, j)) number_of_white_tiles_touched++;
+      if(is_white_board_tile(board, i, j-1)) number_of_white_tiles_touched++;
+      if(is_white_board_tile(board, i, j+1)) number_of_white_tiles_touched++;
+      if(number_of_white_tiles_touched != 1)
+      {
+        continue;
+      }
+      
+      if(is_white_board_tile(board, i-1, j)) set_board_tile_black(board, i-1, j);
+      if(is_white_board_tile(board, i+1, j)) set_board_tile_black(board, i+1, j);
+      if(is_white_board_tile(board, i, j-1)) set_board_tile_black(board, i, j-1);
+      if(is_white_board_tile(board, i, j+1)) set_board_tile_black(board, i, j+1);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_valid_board_tile(board, x, y))
@@ -208,6 +260,16 @@ function is_white_board_tile(board, x , y)
   }
   
   return board[x][y] == W;
+}
+
+function is_black_board_tile(board, x , y)
+{
+  if(!is_valid_board_tile(board, x , y))
+  {
+    return false;
+  }
+  
+  return board[x][y] == B;
 }
 
 function is_number_tile(board, x ,y)
