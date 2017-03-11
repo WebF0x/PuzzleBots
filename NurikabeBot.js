@@ -11,7 +11,7 @@
 */
 
 W = 0; //White tile
-B = 9; //Black tile
+B = -1; //Black tile
 
 (function main()
 {
@@ -24,6 +24,7 @@ B = 9; //Black tile
 function run_all_tests()
 {
   test_when_number_is_1_then_mark_all_sides_as_black();
+  test_when_white_tile_between_two_numbers_then_mark_black();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -45,6 +46,25 @@ function test_when_number_is_1_then_mark_all_sides_as_black()
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles touching a '1' should be marked as black");
 }
 
+function test_when_white_tile_between_two_numbers_then_mark_black()
+{
+  var board = [
+      [2, W, 2],
+      [W, W, W],
+      [2, W, W]
+    ];
+  
+  var expected_solved_board = [
+      [2, B, 2],
+      [B, W, W],
+      [2, W, W]
+    ];
+  
+  var solved_board = solve_white_tiles_between_numbers(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers should be marked as black");
+}
+
 ///////////
 // Board //
 ///////////
@@ -54,7 +74,8 @@ function solve(board)
   var solved_board = board;
 
   solved_board = solve_tiles_numbered_1(solved_board);
-
+  solved_board = solve_white_tiles_between_numbers(solved_board);
+  
   return solved_board;
 }
 
@@ -70,6 +91,31 @@ function solve_tiles_numbered_1(board)
         board = set_board_tile_black(board, i, j+1);
         board = set_board_tile_black(board, i-1, j);
         board = set_board_tile_black(board, i+1, j);
+      }
+    }
+  }
+  
+  return board;
+}
+
+function solve_white_tiles_between_numbers(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(board[i][j] != W)
+      {
+        continue;
+      }
+      
+      var is_between_numbers_horizontally =  is_number_tile(board, i-1, j) && is_number_tile(board, i+1, j);
+      var is_between_numbers_vertically =  is_number_tile(board, i, j-1) && is_number_tile(board, i, j+1);
+      var is_between_numbers = is_between_numbers_horizontally || is_between_numbers_vertically;
+      
+      if(is_between_numbers)
+      {
+        board = set_board_tile_black(board, i, j);
       }
     }
   }
@@ -110,6 +156,16 @@ function is_white_board_tile(board, x , y)
   }
   
   return board[x][y] == W;
+}
+
+function is_number_tile(board, x ,y)
+{
+  if(!is_valid_board_tile(board, x , y))
+  {
+    return false;
+  }
+  
+  return board[x][y] >= 1;
 }
 
 ////////////////
