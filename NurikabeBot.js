@@ -25,6 +25,7 @@ function run_all_tests()
 {
   test_when_number_is_1_then_mark_all_sides_as_black();
   test_when_white_tile_between_two_numbers_then_mark_black();
+  test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -65,6 +66,25 @@ function test_when_white_tile_between_two_numbers_then_mark_black()
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers should be marked as black");
 }
 
+function test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black()
+{
+   var board = [
+      [2, W, W],
+      [W, 2, W],
+      [2, W, W]
+    ];
+  
+  var expected_solved_board = [
+      [2, B, W],
+      [B, 2, W],
+      [2, B, W]
+    ];
+  
+  var solved_board = solve_numbers_touching_by_corners(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers touching by corner should be marked as black");
+}
+
 ///////////
 // Board //
 ///////////
@@ -75,6 +95,7 @@ function solve(board)
 
   solved_board = solve_tiles_numbered_1(solved_board);
   solved_board = solve_white_tiles_between_numbers(solved_board);
+  solved_board = solve_numbers_touching_by_corners(solved_board);
   
   return solved_board;
 }
@@ -116,6 +137,37 @@ function solve_white_tiles_between_numbers(board)
       if(is_between_numbers)
       {
         board = set_board_tile_black(board, i, j);
+      }
+    }
+  }
+  
+  return board;
+}
+
+function solve_numbers_touching_by_corners(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_number_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      var is_bottom_left_tile_a_number = is_number_tile(board, i-1, j+1);
+      var is_bottom_right_tile_a_number = is_number_tile(board, i+1, j+1);
+      
+      if(is_bottom_left_tile_a_number)
+      {
+        set_board_tile_black(board, i-1, j);
+        set_board_tile_black(board, i, j+1);
+      }
+      
+      if(is_bottom_right_tile_a_number)
+      {
+        set_board_tile_black(board, i+1, j);
+        set_board_tile_black(board, i, j+1);
       }
     }
   }
