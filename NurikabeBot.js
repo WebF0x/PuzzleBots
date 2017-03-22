@@ -242,7 +242,7 @@ function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board
   {
     for(var j=0; j<board.length; j++)
     {
-      if(!is_black_board_tile(board, i, j))
+      if(!is_black_tile(board, i, j))
       {
         continue;
       }
@@ -298,7 +298,7 @@ function solve_tiles_without_white_dot_or_number_neighbors(board)
   {
     for(var j=0; j<board.length; j++)
     {
-      if(!is_white_board_tile(board, i, j))
+      if(!is_white_tile(board, i, j))
       {
         continue;
       }
@@ -327,7 +327,7 @@ function solve_tiles_without_white_dot_or_number_neighbors(board)
 
 function set_board_tile_black(board, x, y)
 {
-  if(is_white_board_tile(board, x, y))
+  if(is_white_tile(board, x, y))
   {
     board[x][y] = B;
   }
@@ -337,7 +337,7 @@ function set_board_tile_black(board, x, y)
 
 function set_board_tile_dot(board, x, y)
 {
-  if(is_white_board_tile(board, x, y))
+  if(is_white_tile(board, x, y))
   {
     board[x][y] = D;
   }
@@ -361,7 +361,7 @@ function set_all_neighbors_dot(board, x, y)
   set_board_tile_dot(board, x, y+1);
 }
 
-function is_valid_board_tile(board, x , y)
+function is_valid_tile(board, x , y)
 {
   if(x < 0 || x >= board.length)
   {
@@ -376,9 +376,9 @@ function is_valid_board_tile(board, x , y)
   return true;
 }
 
-function is_white_board_tile(board, x , y)
+function is_white_tile(board, x , y)
 {
-  if(!is_valid_board_tile(board, x , y))
+  if(!is_valid_tile(board, x , y))
   {
     return false;
   }
@@ -386,9 +386,9 @@ function is_white_board_tile(board, x , y)
   return board[x][y] == W;
 }
 
-function is_black_board_tile(board, x , y)
+function is_black_tile(board, x , y)
 {
-  if(!is_valid_board_tile(board, x , y))
+  if(!is_valid_tile(board, x , y))
   {
     return false;
   }
@@ -396,19 +396,9 @@ function is_black_board_tile(board, x , y)
   return board[x][y] == B;
 }
 
-function is_white_board_tile(board, x , y)
+function is_dot_tile(board, x , y)
 {
-  if(!is_valid_board_tile(board, x , y))
-  {
-    return false;
-  }
-  
-  return board[x][y] == W;
-}
-
-function is_dot_board_tile(board, x , y)
-{
-  if(!is_valid_board_tile(board, x , y))
+  if(!is_valid_tile(board, x , y))
   {
     return false;
   }
@@ -416,9 +406,9 @@ function is_dot_board_tile(board, x , y)
   return board[x][y] == D;
 }
 
-function is_number_board_tile(board, x ,y)
+function is_number_tile(board, x ,y)
 {
-  if(!is_valid_board_tile(board, x , y))
+  if(!is_valid_tile(board, x , y))
   {
     return false;
   }
@@ -429,40 +419,40 @@ function is_number_board_tile(board, x ,y)
 function get_number_of_black_neighbors(board, x , y)
 {
   var count = 0;
-  if(is_black_board_tile(board, x-1, y)) count++;
-  if(is_black_board_tile(board, x+1, y)) count++;
-  if(is_black_board_tile(board, x, y-1)) count++;
-  if(is_black_board_tile(board, x, y+1)) count++;
+  if(is_black_tile(board, x-1, y)) count++;
+  if(is_black_tile(board, x+1, y)) count++;
+  if(is_black_tile(board, x, y-1)) count++;
+  if(is_black_tile(board, x, y+1)) count++;
   return count;
 }
 
 function get_number_of_white_neighbors(board, x , y)
 {
   var count = 0;
-  if(is_white_board_tile(board, x-1, y)) count++;
-  if(is_white_board_tile(board, x+1, y)) count++;
-  if(is_white_board_tile(board, x, y-1)) count++;
-  if(is_white_board_tile(board, x, y+1)) count++;
+  if(is_white_tile(board, x-1, y)) count++;
+  if(is_white_tile(board, x+1, y)) count++;
+  if(is_white_tile(board, x, y-1)) count++;
+  if(is_white_tile(board, x, y+1)) count++;
   return count;
 }
 
 function get_number_of_dot_neighbors(board, x , y)
 {
   var count = 0;
-  if(is_dot_board_tile(board, x-1, y)) count++;
-  if(is_dot_board_tile(board, x+1, y)) count++;
-  if(is_dot_board_tile(board, x, y-1)) count++;
-  if(is_dot_board_tile(board, x, y+1)) count++;
+  if(is_dot_tile(board, x-1, y)) count++;
+  if(is_dot_tile(board, x+1, y)) count++;
+  if(is_dot_tile(board, x, y-1)) count++;
+  if(is_dot_tile(board, x, y+1)) count++;
   return count;
 }
 
 function get_number_of_number_neighbors(board, x , y)
 {
   var count = 0;
-  if(is_number_board_tile(board, x-1, y)) count++;
-  if(is_number_board_tile(board, x+1, y)) count++;
-  if(is_number_board_tile(board, x, y-1)) count++;
-  if(is_number_board_tile(board, x, y+1)) count++;
+  if(is_number_tile(board, x-1, y)) count++;
+  if(is_number_tile(board, x+1, y)) count++;
+  if(is_number_tile(board, x, y-1)) count++;
+  if(is_number_tile(board, x, y+1)) count++;
   return count;
 }
 
