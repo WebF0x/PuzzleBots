@@ -434,6 +434,11 @@ function get_html_board_tile_value(html_board, x, y)
     return B;
   }
   
+  if(html_board_tile.innerHTML.includes("nux.gif"))
+  {
+    return D;
+  }
+  
   return Number(html_board_tile.innerHTML);
 }
 
