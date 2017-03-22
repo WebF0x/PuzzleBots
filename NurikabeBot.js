@@ -151,7 +151,7 @@ function solve_tiles_numbered_1(board)
     {
       if(board[i][j] == 1)
       {
-        set_all_neighbors_white(board, i, j);
+        set_all_neighbors_black(board, i, j);
       }
     }
   }
@@ -236,7 +236,7 @@ function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board
         continue;
       }
       
-      set_all_neighbors_white(board, i, j);
+      set_all_neighbors_black(board, i, j);
     }
   }
   
@@ -291,7 +291,7 @@ function set_board_tile_dot(board, x, y)
   return board;
 }
 
-function set_all_neighbors_white(board, x, y)
+function set_all_neighbors_black(board, x, y)
 {
   set_board_tile_black(board, x-1, y);
   set_board_tile_black(board, x+1, y);
