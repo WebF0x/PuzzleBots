@@ -29,6 +29,7 @@ function run_all_tests()
   test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black();
   test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mark_it_black();
   test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then_mark_it_dot();
+  test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -126,6 +127,25 @@ function test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then
   assert(are_arrays_equal(expected_solved_board, solved_board), "When number tile touches only one white tile and no dots, it should be marked as dot");
 }
 
+function test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black()
+{
+  var board = [
+      [B, D, W],
+      [W, B, W],
+      [B, 2, W]
+    ];
+  
+  var expected_solved_board = [
+      [B, D, W],
+      [B, B, W],
+      [B, 2, W]
+    ];
+  
+  var solved_board = solve_tiles_without_white_dot_or_number_neighbors(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When white tile has no white, dot or number neighbors, it should be marked as black");
+}
+
 ///////////
 // Board //
 ///////////
@@ -139,6 +159,7 @@ function solve(board)
   solved_board = solve_numbers_touching_by_corners(solved_board);
   solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(solved_board);
   solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(solved_board);
+  solved_board = solve_tiles_without_white_dot_or_number_neighbors(solved_board);
   
   return solved_board;
 }
@@ -271,6 +292,39 @@ function solve_number_tile_touching_only_one_white_tile_and_no_dots(board)
   return board;
 }
 
+function solve_tiles_without_white_dot_or_number_neighbors(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_white_board_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      if(get_number_of_white_neighbors(board, i, j) != 0)
+      {
+        continue;
+      }
+      
+      if(get_number_of_dot_neighbors(board, i, j) != 0)
+      {
+        continue;
+      }
+      
+      if(get_number_of_number_neighbors(board, i, j) != 0)
+      {
+        continue;
+      }
+      
+      set_board_tile_black(board, i, j);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_white_board_tile(board, x, y))
@@ -342,6 +396,16 @@ function is_black_board_tile(board, x , y)
   return board[x][y] == B;
 }
 
+function is_white_board_tile(board, x , y)
+{
+  if(!is_valid_board_tile(board, x , y))
+  {
+    return false;
+  }
+  
+  return board[x][y] == W;
+}
+
 function is_dot_board_tile(board, x , y)
 {
   if(!is_valid_board_tile(board, x , y))
@@ -352,7 +416,7 @@ function is_dot_board_tile(board, x , y)
   return board[x][y] == D;
 }
 
-function is_number_tile(board, x ,y)
+function is_number_board_tile(board, x ,y)
 {
   if(!is_valid_board_tile(board, x , y))
   {
@@ -389,6 +453,16 @@ function get_number_of_dot_neighbors(board, x , y)
   if(is_dot_board_tile(board, x+1, y)) count++;
   if(is_dot_board_tile(board, x, y-1)) count++;
   if(is_dot_board_tile(board, x, y+1)) count++;
+  return count;
+}
+
+function get_number_of_number_neighbors(board, x , y)
+{
+  var count = 0;
+  if(is_number_board_tile(board, x-1, y)) count++;
+  if(is_number_board_tile(board, x+1, y)) count++;
+  if(is_number_board_tile(board, x, y-1)) count++;
+  if(is_number_board_tile(board, x, y+1)) count++;
   return count;
 }
 
