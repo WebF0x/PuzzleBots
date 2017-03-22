@@ -30,6 +30,7 @@ function run_all_tests()
   test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mark_it_black();
   test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then_mark_it_dot();
   test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black();
+  test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -146,6 +147,25 @@ function test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_
   assert(are_arrays_equal(expected_solved_board, solved_board), "When white tile has no white, dot or number neighbors, it should be marked as black");
 }
 
+function test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot()
+{
+  var board = [
+      [W, B, B],
+      [W, W, B],
+      [W, W, W]
+    ];
+  
+  var expected_solved_board = [
+      [W, B, B],
+      [W, D, B],
+      [W, W, W]
+    ];
+  
+  var solved_board = solve_white_tiles_that_could_complete_illegal_black_square(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When a white could complete an illegal black square, it should be marked as dot");
+}
+
 ///////////
 // Board //
 ///////////
@@ -160,7 +180,8 @@ function solve(board)
   solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(solved_board);
   solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(solved_board);
   solved_board = solve_tiles_without_white_dot_or_number_neighbors(solved_board);
-  
+  solved_board = solve_white_tiles_that_could_complete_illegal_black_square(solved_board);
+
   return solved_board;
 }
 
@@ -325,6 +346,29 @@ function solve_tiles_without_white_dot_or_number_neighbors(board)
   return board;
 }
 
+function solve_white_tiles_that_could_complete_illegal_black_square(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_white_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      if(!white_tile_could_complete_illegal_black_square(board, i, j))
+      {
+        continue;
+      }
+      
+      set_board_tile_dot(board, i, j);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_white_tile(board, x, y))
@@ -414,6 +458,48 @@ function is_number_tile(board, x ,y)
   }
   
   return board[x][y] >= 1;
+}
+
+function white_tile_could_complete_illegal_black_square(board, x, y)
+{
+  if(!is_white_tile(board, x, y))
+  {
+    return false;
+  }
+  
+  //Would complete top left corner?
+  if(is_black_tile(board, x+1, y+1) &&
+     is_black_tile(board, x+1, y) &&
+     is_black_tile(board, x, y+1))
+  {
+    return true;
+  }
+  
+  //Would complete top right corner?
+  if(is_black_tile(board, x-1, y+1) &&
+     is_black_tile(board, x-1, y) &&
+     is_black_tile(board, x, y+1))
+  {
+    return true;
+  }
+  
+  //Would complete bot left corner?
+  if(is_black_tile(board, x+1, y-1) &&
+     is_black_tile(board, x+1, y) &&
+     is_black_tile(board, x, y-1))
+  {
+    return true;
+  }
+  
+  //Would complete bot right corner?
+  if(is_black_tile(board, x-1, y-1) &&
+     is_black_tile(board, x-1, y) &&
+     is_black_tile(board, x, y-1))
+  {
+    return true;
+  }
+    
+  return false;
 }
 
 function get_number_of_black_neighbors(board, x , y)
