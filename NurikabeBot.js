@@ -12,6 +12,7 @@
 
 W = 0; //White tile
 B = -1; //Black tile
+D = -2; //Dot tile
 
 (function main()
 {
@@ -27,6 +28,7 @@ function run_all_tests()
   test_when_white_tile_between_two_numbers_then_mark_black();
   test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black();
   test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mark_it_black();
+  test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then_mark_it_dot();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -105,6 +107,25 @@ function test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mar
   assert(are_arrays_equal(expected_solved_board, solved_board), "When black tile touches only one white tile, it should be marked as black");
 }
 
+function test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then_mark_it_dot()
+{
+  var board = [
+      [B, W, W],
+      [3, W, W],
+      [B, B, B]
+    ];
+  
+  var expected_solved_board = [
+      [B, W, W],
+      [3, D, W],
+      [B, B, B]
+    ];
+  
+  var solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When number tile touches only one white tile and no dots, it should be marked as dot");
+}
+
 ///////////
 // Board //
 ///////////
@@ -117,6 +138,7 @@ function solve(board)
   solved_board = solve_white_tiles_between_numbers(solved_board);
   solved_board = solve_numbers_touching_by_corners(solved_board);
   solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(solved_board);
+  solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(solved_board);
   
   return solved_board;
 }
@@ -221,11 +243,49 @@ function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board
   return board;
 }
 
+function solve_number_tile_touching_only_one_white_tile_and_no_dots(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_number_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      if(get_number_of_dot_neighbors(board, i, j) != 0)
+      {
+        continue;
+      }
+      
+      if(get_number_of_white_neighbors(board, i, j) != 1)
+      {
+        continue;
+      }
+      
+      set_all_neighbors_dot(board, i, j);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_white_board_tile(board, x, y))
   {
     board[x][y] = B;
+  }
+  
+  return board;
+}
+
+function set_board_tile_dot(board, x, y)
+{
+  if(is_white_board_tile(board, x, y))
+  {
+    board[x][y] = D;
   }
   
   return board;
@@ -237,6 +297,14 @@ function set_all_neighbors_white(board, x, y)
   set_board_tile_black(board, x+1, y);
   set_board_tile_black(board, x, y-1);
   set_board_tile_black(board, x, y+1);
+}
+
+function set_all_neighbors_dot(board, x, y)
+{
+  set_board_tile_dot(board, x-1, y);
+  set_board_tile_dot(board, x+1, y);
+  set_board_tile_dot(board, x, y-1);
+  set_board_tile_dot(board, x, y+1);
 }
 
 function is_valid_board_tile(board, x , y)
@@ -274,6 +342,16 @@ function is_black_board_tile(board, x , y)
   return board[x][y] == B;
 }
 
+function is_dot_board_tile(board, x , y)
+{
+  if(!is_valid_board_tile(board, x , y))
+  {
+    return false;
+  }
+  
+  return board[x][y] == D;
+}
+
 function is_number_tile(board, x ,y)
 {
   if(!is_valid_board_tile(board, x , y))
@@ -301,6 +379,16 @@ function get_number_of_white_neighbors(board, x , y)
   if(is_white_board_tile(board, x+1, y)) count++;
   if(is_white_board_tile(board, x, y-1)) count++;
   if(is_white_board_tile(board, x, y+1)) count++;
+  return count;
+}
+
+function get_number_of_dot_neighbors(board, x , y)
+{
+  var count = 0;
+  if(is_dot_board_tile(board, x-1, y)) count++;
+  if(is_dot_board_tile(board, x+1, y)) count++;
+  if(is_dot_board_tile(board, x, y-1)) count++;
+  if(is_dot_board_tile(board, x, y+1)) count++;
   return count;
 }
 
@@ -371,6 +459,11 @@ function update_html_board(html_board, board)
       {
         set_html_board_black_tile(html_board, i, j)
       }
+      
+      if(board[i][j] == D)
+      {
+        set_html_board_dot_tile(html_board, i, j)
+      }
     }
   }
 }
@@ -379,6 +472,12 @@ function set_html_board_black_tile(html_board, x, y)
 {
   var html_board_tile = get_html_board_tile(html_board, x, y)
   html_board_tile.innerHTML = html_board_tile.innerHTML.replace("nun.gif", "nuy.gif");
+}
+
+function set_html_board_dot_tile(html_board, x, y)
+{
+  var html_board_tile = get_html_board_tile(html_board, x, y)
+  html_board_tile.innerHTML = html_board_tile.innerHTML.replace("nun.gif", "nux.gif");
 }
 
 function get_html_board_tile(html_board, x, y)
