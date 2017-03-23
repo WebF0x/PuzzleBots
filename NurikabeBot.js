@@ -32,6 +32,7 @@ function run_all_tests()
   test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black();
   test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot();
   test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_mark_dot();
+  test_get_pool_size();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -184,6 +185,20 @@ function test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_ma
   var solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a dot touches a single white tile and no dot tiles and no number tiles, the white tile should be marked as dot");
+}
+
+function test_get_pool_size()
+{
+  var board = [
+      [D, W, B],
+      [5, D, B],
+      [W, D, B]
+    ];
+  
+  var expected_pool_size = 4;
+  var pool_size = get_pool_size(board, 0, 0);
+  
+  assert((expected_pool_size == pool_size), "Pool size should include the number tile and all the dot tiles in the same pool");
 }
 
 ///////////
@@ -514,6 +529,11 @@ function is_number_tile(board, x ,y)
   return board[x][y] >= 1;
 }
 
+function is_pool_tile(board, x, y)
+{
+  return is_dot_tile(board, x ,y) || is_number_tile(board, x ,y);
+}
+
 function white_tile_could_complete_illegal_black_square(board, x, y)
 {
   if(!is_white_tile(board, x, y))
@@ -556,6 +576,27 @@ function white_tile_could_complete_illegal_black_square(board, x, y)
   return false;
 }
 
+function get_neighbors(x, y)
+{
+  return [[x, y+1], 
+          [x, y-1], 
+          [x+1, y], 
+          [x-1, y]];
+}
+
+function get_pool_neighbors(board, x, y)
+{
+  var pool_neighbors = [];
+  for(var neighbor of get_neighbors(x, y))
+  {
+    if(is_pool_tile(board, neighbor[0], neighbor[1]))
+    {
+      pool_neighbors.push(neighbor);
+    }
+  }
+  return pool_neighbors;
+}
+
 function get_number_of_black_neighbors(board, x , y)
 {
   var count = 0;
@@ -594,6 +635,24 @@ function get_number_of_number_neighbors(board, x , y)
   if(is_number_tile(board, x, y-1)) count++;
   if(is_number_tile(board, x, y+1)) count++;
   return count;
+}
+
+function get_pool_size(board, x, y)
+{
+  var pool = [[x, y]];
+  var previous_size = 0;
+  while(pool.length != previous_size)
+  {
+    previous_size = pool.length;
+    for(var tile of pool)
+    {
+      for(var pool_neighbor of get_pool_neighbors(board, tile[0], tile[1]))
+      {
+        add_to_array_if_unique(pool, pool_neighbor);
+      }
+    }
+  }
+  return pool.length;
 }
 
 ////////////////
@@ -730,4 +789,24 @@ function are_arrays_equal(array1, array2)
         }
     }
     return true;
+}
+
+function array_contains(array, element)
+{
+  for(var array_element of array)
+  {
+    if(are_arrays_equal(array_element, element))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+function add_to_array_if_unique(array, element)
+{
+  if(!array_contains(array, element))
+  {
+    array.push(element);      
+  }
 }
