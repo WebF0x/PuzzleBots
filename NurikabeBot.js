@@ -34,6 +34,7 @@ function run_all_tests()
   test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_mark_dot();
   test_get_pool_size();
   test_when_pool_is_complete_then_surround_with_black_tiles();
+  test_get_black_pool_size();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -219,6 +220,20 @@ function test_when_pool_is_complete_then_surround_with_black_tiles()
   var solved_board = surround_complete_pools_with_black_tiles(board);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a pool is complete, the surrounding tiles should be marked as black");
+}
+
+function test_get_black_pool_size()
+{
+  var board = [
+      [D, W, B],
+      [5, D, B],
+      [W, D, B]
+    ];
+  
+  var expected_pool_size = 3;
+  var pool_size = get_black_pool_size(board, 2, 2);
+  
+  assert((expected_pool_size == pool_size), "Black pool size should include the number of black tiles");
 }
 
 ///////////
@@ -641,6 +656,19 @@ function get_pool_neighbors(board, x, y)
   return pool_neighbors;
 }
 
+function get_black_neighbors(board, x, y)
+{
+  var black_neighbors = [];
+  for(var neighbor of get_neighbors(x, y))
+  {
+    if(is_black_tile(board, neighbor[0], neighbor[1]))
+    {
+      black_neighbors.push(neighbor);
+    }
+  }
+  return black_neighbors;
+}
+
 function get_number_of_black_neighbors(board, x , y)
 {
   var count = 0;
@@ -710,6 +738,29 @@ function set_all_pool_neighbors_black(board, x, y)
   {
     set_all_neighbors_black(board, pool_neighbor[0], pool_neighbor[1]);
   }
+}
+
+function get_black_pool(board, x, y)
+{
+  var black_pool = [[x, y]];
+  var previous_size = 0;
+  while(black_pool.length != previous_size)
+  {
+    previous_size = black_pool.length;
+    for(var tile of black_pool)
+    {
+      for(var pool_neighbor of get_black_neighbors(board, tile[0], tile[1]))
+      {
+        add_to_array_if_unique(black_pool, pool_neighbor);
+      }
+    }
+  }
+  return black_pool;
+}
+
+function get_black_pool_size(board, x, y)
+{
+  return get_black_pool(board, x, y).length;
 }
 
 ////////////////
