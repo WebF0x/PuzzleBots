@@ -36,7 +36,7 @@ function run_all_tests()
   test_when_white_pool_is_complete_then_surround_with_black_tiles();
   test_get_black_pool_size();
   test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
-  test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
+  test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_dot();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -257,6 +257,25 @@ function test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black()
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a black pool touches only one white tile, that tile should be marked as black");
 }
 
+function test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_dot()
+{
+  var board = [
+      [B, B, B],
+      [D, W, W],
+      [3, B, B]
+    ];
+  
+  var expected_solved_board = [
+      [B, B, B],
+      [D, D, W],
+      [3, B, B]
+    ];
+  
+  var solved_board = extend_uncomplete_white_pools_with_one_white_neighbor(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When an uncomplete white pool touches only one white tile, that tile should be marked as dot");
+}
+
 ///////////
 // Board //
 ///////////
@@ -275,6 +294,7 @@ function solve(board)
   solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(solved_board);
   solved_board = surround_complete_white_pools_with_black_tiles(solved_board);
   solved_board = extend_black_pools_with_one_white_neighbor(solved_board);
+  solved_board = extend_uncomplete_white_pools_with_one_white_neighbor(solved_board);
 
   return solved_board;
 }
@@ -542,6 +562,29 @@ function extend_black_pools_with_one_white_neighbor(board)
   return board;
 }
 
+function extend_uncomplete_white_pools_with_one_white_neighbor(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_number_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      if(get_white_pool_white_neighbors(board, i, j).length != 1)
+      {
+        continue;
+      }
+            
+      set_all_white_pool_neighbors_dot(board, i, j);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_white_tile(board, x, y))
@@ -730,8 +773,7 @@ function get_white_neighbors(board, x, y)
 function get_black_pool_white_neighbors(board, x, y)
 {
   black_pool_white_neighbors = [];
-  var black_pool = get_black_pool(board, x, y);
-  for(var black_tile of black_pool)
+  for(var black_tile of get_black_pool(board, x, y))
   {
     for(var white_neighbor of get_white_neighbors(board, black_tile[0], black_tile[1]))
     {
@@ -739,6 +781,19 @@ function get_black_pool_white_neighbors(board, x, y)
     }
   }
   return black_pool_white_neighbors;
+}
+
+function get_white_pool_white_neighbors(board, x, y)
+{
+  white_pool_white_neighbors = [];
+  for(var white_tile of get_white_pool(board, x, y))
+  {
+    for(var white_neighbor of get_white_neighbors(board, white_tile[0], white_tile[1]))
+    {
+      add_to_array_if_unique(white_pool_white_neighbors, white_neighbor);
+    }
+  }
+  return white_pool_white_neighbors;
 }
 
 function get_number_of_black_neighbors(board, x , y)
@@ -817,6 +872,14 @@ function set_all_black_pool_neighbors_black(board, x, y)
   for(var black_pool_tile of get_black_pool(board, x, y))
   {
     set_all_neighbors_black(board, black_pool_tile[0], black_pool_tile[1]);
+  }
+}
+
+function set_all_white_pool_neighbors_dot(board, x, y)
+{
+  for(var white_pool_tile of get_white_pool(board, x, y))
+  {
+    set_all_neighbors_dot(board, white_pool_tile[0], white_pool_tile[1]);
   }
 }
 
