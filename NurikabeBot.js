@@ -850,7 +850,7 @@ function solve_html_board(html_board)
 {
     var board = get_board_from_html_board(html_board);
     var solved_board = solve(board);
-    update_html_board(html_board, solved_board);
+    update_html_board(solved_board);
 }
 
 function get_board_from_html_board(html_board)
@@ -904,7 +904,7 @@ function get_html_board()
   return table_body;
 }
 
-function update_html_board(html_board, board)
+function update_html_board(board)
 {
   for(var i=0; i<board.length; i++)
   {
@@ -912,27 +912,33 @@ function update_html_board(html_board, board)
     {
       if(board[i][j] == B)
       {
-        set_html_board_black_tile(html_board, i, j)
+        set_html_board_black_tile(i, j)
       }
       
       if(board[i][j] == D)
       {
-        set_html_board_dot_tile(html_board, i, j)
+        set_html_board_dot_tile(i, j)
       }
     }
   }
 }
 
-function set_html_board_black_tile(html_board, x, y)
+function set_html_board_black_tile(x, y)
 {
-  var html_board_tile = get_html_board_tile(html_board, x, y)
-  html_board_tile.innerHTML = html_board_tile.innerHTML.replace("nun.gif", "nuy.gif");
+  var sender = document.getElementsByName("i_"+y+"_"+x)[0];  
+  setImg(sender, "y");
 }
 
-function set_html_board_dot_tile(html_board, x, y)
+function set_html_board_dot_tile(x, y)
 {
-  var html_board_tile = get_html_board_tile(html_board, x, y)
-  html_board_tile.innerHTML = html_board_tile.innerHTML.replace("nun.gif", "nux.gif");
+  var sender = document.getElementsByName("i_"+y+"_"+x)[0];  
+  setImg(sender, "x");
+}
+
+function set_html_board_white_tile(x, y)
+{
+  var sender = document.getElementsByName("i_"+y+"_"+x)[0];  
+  setImg(sender, "n");
 }
 
 function get_html_board_tile(html_board, x, y)
