@@ -9,3 +9,4 @@ Solve various puzzles on the Internet
 ## Puzzles
 
 - [Light Up](http://www.puzzle-light-up.com/)
+- [Nurikabe](http://www.puzzle-nurikabe.com/)
