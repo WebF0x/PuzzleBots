@@ -6,8 +6,8 @@
   
   Rules:
    - All black squares must be contiguous (diagonally doesn't count)
-   - A tile numbered N must be in a pool of N contiguous white tiles
-   - Two numbers cannot be in the same pool
+   - A tile numbered N must be in a white pool of N contiguous tiles
+   - Two numbers cannot be in the same white pool
 */
 
 W = 0; //White tile
@@ -32,9 +32,10 @@ function run_all_tests()
   test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black();
   test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot();
   test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_mark_dot();
-  test_get_pool_size();
-  test_when_pool_is_complete_then_surround_with_black_tiles();
+  test_get_white_pool_size();
+  test_when_white_pool_is_complete_then_surround_with_black_tiles();
   test_get_black_pool_size();
+  test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
   test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
 }
 
@@ -190,7 +191,7 @@ function test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_ma
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a dot touches a single white tile and no dot tiles and no number tiles, the white tile should be marked as dot");
 }
 
-function test_get_pool_size()
+function test_get_white_pool_size()
 {
   var board = [
       [D, W, B],
@@ -199,12 +200,12 @@ function test_get_pool_size()
     ];
   
   var expected_pool_size = 4;
-  var pool_size = get_pool_size(board, 0, 0);
+  var pool_size = get_white_pool_size(board, 0, 0);
   
-  assert((expected_pool_size == pool_size), "Pool size should include the number tile and all the dot tiles in the same pool");
+  assert((expected_pool_size == pool_size), "White pool size should include the number tile and all the dot tiles in the same pool");
 }
 
-function test_when_pool_is_complete_then_surround_with_black_tiles()
+function test_when_white_pool_is_complete_then_surround_with_black_tiles()
 {
   var board = [
       [2, W, W],
@@ -218,9 +219,9 @@ function test_when_pool_is_complete_then_surround_with_black_tiles()
       [B, W, W]
     ];
   
-  var solved_board = surround_complete_pools_with_black_tiles(board);
+  var solved_board = surround_complete_white_pools_with_black_tiles(board);
   
-  assert(are_arrays_equal(expected_solved_board, solved_board), "When a pool is complete, the surrounding tiles should be marked as black");
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When a white pool is complete, the surrounding tiles should be marked as black");
 }
 
 function test_get_black_pool_size()
@@ -272,7 +273,7 @@ function solve(board)
   solved_board = solve_tiles_without_white_dot_or_number_neighbors(solved_board);
   solved_board = solve_white_tiles_that_could_complete_illegal_black_square(solved_board);
   solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(solved_board);
-  solved_board = surround_complete_pools_with_black_tiles(solved_board);
+  solved_board = surround_complete_white_pools_with_black_tiles(solved_board);
   solved_board = extend_black_pools_with_one_white_neighbor(solved_board);
 
   return solved_board;
@@ -495,7 +496,7 @@ function solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board)
   return board;
 }
 
-function surround_complete_pools_with_black_tiles(board)
+function surround_complete_white_pools_with_black_tiles(board)
 {
   for(var i=0; i<board.length; i++)
   {
@@ -506,12 +507,12 @@ function surround_complete_pools_with_black_tiles(board)
         continue;
       }
       
-      if(board[i][j] != get_pool_size(board, i, j))
+      if(board[i][j] != get_white_pool_size(board, i, j))
       {
         continue;
       }
             
-      set_all_pool_neighbors_black(board, i, j);
+      set_all_white_pool_neighbors_black(board, i, j);
     }
   }
   
@@ -632,7 +633,7 @@ function is_number_tile(board, x ,y)
   return board[x][y] >= 1;
 }
 
-function is_pool_tile(board, x, y)
+function is_white_pool_tile(board, x, y)
 {
   return is_dot_tile(board, x ,y) || is_number_tile(board, x ,y);
 }
@@ -687,17 +688,17 @@ function get_neighbors(x, y)
           [x-1, y]];
 }
 
-function get_pool_neighbors(board, x, y)
+function get_white_pool_neighbors(board, x, y)
 {
-  var pool_neighbors = [];
+  var white_pool_neighbors = [];
   for(var neighbor of get_neighbors(x, y))
   {
-    if(is_pool_tile(board, neighbor[0], neighbor[1]))
+    if(is_white_pool_tile(board, neighbor[0], neighbor[1]))
     {
-      pool_neighbors.push(neighbor);
+      white_pool_neighbors.push(neighbor);
     }
   }
-  return pool_neighbors;
+  return white_pool_neighbors;
 }
 
 function get_black_neighbors(board, x, y)
@@ -780,34 +781,34 @@ function get_number_of_number_neighbors(board, x , y)
   return count;
 }
 
-function get_pool(board, x, y)
+function get_white_pool(board, x, y)
 {
-  var pool = [[x, y]];
+  var white_pool = [[x, y]];
   var previous_size = 0;
-  while(pool.length != previous_size)
+  while(white_pool.length != previous_size)
   {
-    previous_size = pool.length;
-    for(var tile of pool)
+    previous_size = white_pool.length;
+    for(var tile of white_pool)
     {
-      for(var pool_neighbor of get_pool_neighbors(board, tile[0], tile[1]))
+      for(var pool_neighbor of get_white_pool_neighbors(board, tile[0], tile[1]))
       {
-        add_to_array_if_unique(pool, pool_neighbor);
+        add_to_array_if_unique(white_pool, pool_neighbor);
       }
     }
   }
-  return pool;
+  return white_pool;
 }
 
-function get_pool_size(board, x, y)
+function get_white_pool_size(board, x, y)
 {
-  return get_pool(board, x, y).length;
+  return get_white_pool(board, x, y).length;
 }
 
-function set_all_pool_neighbors_black(board, x, y)
+function set_all_white_pool_neighbors_black(board, x, y)
 {
-  for(var pool_tile of get_pool(board, x, y))
+  for(var white_pool_tile of get_white_pool(board, x, y))
   {
-    set_all_neighbors_black(board, pool_tile[0], pool_tile[1]);
+    set_all_neighbors_black(board, white_pool_tile[0], white_pool_tile[1]);
   }
 }
 
