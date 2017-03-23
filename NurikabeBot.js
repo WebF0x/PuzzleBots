@@ -33,6 +33,7 @@ function run_all_tests()
   test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot();
   test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_mark_dot();
   test_get_pool_size();
+  test_when_pool_is_complete_then_surround_with_black_tiles();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -201,6 +202,25 @@ function test_get_pool_size()
   assert((expected_pool_size == pool_size), "Pool size should include the number tile and all the dot tiles in the same pool");
 }
 
+function test_when_pool_is_complete_then_surround_with_black_tiles()
+{
+  var board = [
+      [2, W, W],
+      [D, W, W],
+      [W, W, W]
+    ];
+  
+  var expected_solved_board = [
+      [2, B, W],
+      [D, B, W],
+      [B, W, W]
+    ];
+  
+  var solved_board = surround_complete_pools_with_black_tiles(board);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When a pool is complete, the surrounding tiles should be marked as black");
+}
+
 ///////////
 // Board //
 ///////////
@@ -217,6 +237,7 @@ function solve(board)
   solved_board = solve_tiles_without_white_dot_or_number_neighbors(solved_board);
   solved_board = solve_white_tiles_that_could_complete_illegal_black_square(solved_board);
   solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(solved_board);
+  solved_board = surround_complete_pools_with_black_tiles(solved_board);
 
   return solved_board;
 }
@@ -438,6 +459,29 @@ function solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board)
   return board;
 }
 
+function surround_complete_pools_with_black_tiles(board)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
+    {
+      if(!is_number_tile(board, i, j))
+      {
+        continue;
+      }
+      
+      if(board[i][j] != get_pool_size(board, i, j))
+      {
+        continue;
+      }
+            
+      set_all_pool_neighbors_black(board, i, j);
+    }
+  }
+  
+  return board;
+}
+
 function set_board_tile_black(board, x, y)
 {
   if(is_white_tile(board, x, y))
@@ -637,7 +681,7 @@ function get_number_of_number_neighbors(board, x , y)
   return count;
 }
 
-function get_pool_size(board, x, y)
+function get_pool(board, x, y)
 {
   var pool = [[x, y]];
   var previous_size = 0;
@@ -652,7 +696,20 @@ function get_pool_size(board, x, y)
       }
     }
   }
-  return pool.length;
+  return pool;
+}
+
+function get_pool_size(board, x, y)
+{
+  return get_pool(board, x, y).length;
+}
+
+function set_all_pool_neighbors_black(board, x, y)
+{
+  for(var pool_neighbor of get_pool(board, x, y))
+  {
+    set_all_neighbors_black(board, pool_neighbor[0], pool_neighbor[1]);
+  }
 }
 
 ////////////////
