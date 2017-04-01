@@ -19,7 +19,19 @@ D = -2; //Dot tile
   run_all_tests();
   
   var html_board = get_html_board();
-  solve_html_board(html_board);
+  solve_functions = [solve_tiles_numbered_1,
+                     solve_white_tiles_between_numbers,
+                     solve_numbers_touching_by_corners,
+                     solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles,
+                     solve_number_tile_touching_only_one_white_tile_and_no_dots,
+                     solve_tiles_without_white_dot_or_number_neighbors,
+                     solve_white_tiles_that_could_complete_illegal_black_square,
+                     solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles,
+                     surround_complete_white_pools_with_black_tiles,
+                     extend_black_pools_with_one_white_neighbor,
+                     extend_uncomplete_white_pools_with_one_white_neighbor];
+  
+  solve_html_board(html_board, solve_functions);
 })();
 
 function run_all_tests()
@@ -37,6 +49,7 @@ function run_all_tests()
   test_get_black_pool_size();
   test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
   test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_dot();
+  test_when_solving_board_then_keep_trying_as_long_as_you_progress();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -276,27 +289,62 @@ function test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_d
   assert(are_arrays_equal(expected_solved_board, solved_board), "When an uncomplete white pool touches only one white tile, that tile should be marked as dot");
 }
 
+function test_when_solving_board_then_keep_trying_as_long_as_you_progress()
+{
+  var mock_solve_function_has_been_called_before = false;
+  function mock_solve_function_requiring_two_runs(board)
+  {
+    if(!mock_solve_function_has_been_called_before)
+    {
+      board = [
+        [1, B],
+        [B, W]
+      ];
+    }
+    else
+    {
+      board = [
+        [1, B],
+        [B, B]
+      ];
+    }
+    mock_solve_function_has_been_called_before = true;
+    return board;
+  }
+  
+  var board = [
+      [1, W],
+      [W, W]
+    ];
+  
+  var expected_solved_board = [
+      [1, B],
+      [B, B]
+    ];
+  
+  var solved_board = solve(board, [mock_solve_function_requiring_two_runs]);
+  
+  assert(are_arrays_equal(expected_solved_board, solved_board), "When solving the board, keep solving as long as there is progress");
+}
+
 ///////////
 // Board //
 ///////////
 
-function solve(board)
+function solve(board, solve_functions)
 {
-  var solved_board = board;
-
-  solved_board = solve_tiles_numbered_1(solved_board);
-  solved_board = solve_white_tiles_between_numbers(solved_board);
-  solved_board = solve_numbers_touching_by_corners(solved_board);
-  solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(solved_board);
-  solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(solved_board);
-  solved_board = solve_tiles_without_white_dot_or_number_neighbors(solved_board);
-  solved_board = solve_white_tiles_that_could_complete_illegal_black_square(solved_board);
-  solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(solved_board);
-  solved_board = surround_complete_white_pools_with_black_tiles(solved_board);
-  solved_board = extend_black_pools_with_one_white_neighbor(solved_board);
-  solved_board = extend_uncomplete_white_pools_with_one_white_neighbor(solved_board);
-
-  return solved_board;
+  var initial_board = [];
+  
+  while(!are_arrays_equal(board, initial_board))
+  {    
+    initial_board = copy_array(board);
+    for(var solve_function of solve_functions)
+    {
+      board = solve_function(board);
+    }
+  }
+  
+  return board;
 }
 
 function solve_tiles_numbered_1(board)
@@ -910,10 +958,10 @@ function get_black_pool_size(board, x, y)
 // HTML board //
 ////////////////
 
-function solve_html_board(html_board)
+function solve_html_board(html_board, solve_functions)
 {
     var board = get_board_from_html_board(html_board);
-    var solved_board = solve(board);
+    var solved_board = solve(board, solve_functions);
     update_html_board(solved_board);
 }
 
@@ -1066,4 +1114,13 @@ function add_to_array_if_unique(array, element)
   {
     array.push(element);      
   }
+}
+
+function copy_array(array)
+{
+  return array.map(
+    function(arr)
+    {
+      return arr.slice();
+    });
 }
