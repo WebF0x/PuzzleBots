@@ -542,57 +542,32 @@ function solve_numbers_touching_by_corners(board, x, y)
 
 function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board, x, y)
 {
-  if(get_number_of_white_neighbors(board, x, y) != 1)
+  if(get_number_of_white_neighbors(board, x, y) == 1 && 
+     get_number_of_black_neighbors(board, x, y) == 0)
   {
-    return board;
+    set_all_neighbors_black(board, x, y);
   }
-
-  if(get_number_of_black_neighbors(board, x, y) != 0)
-  {
-    return board;
-  }
-
-  set_all_neighbors_black(board, x, y);
-  
   return board;
 }
 
 function solve_number_tile_touching_only_one_white_tile_and_no_dots(board, x, y)
 {
-  if(get_number_of_dot_neighbors(board, x, y) != 0)
+  if(get_number_of_dot_neighbors(board, x, y) == 0 &&
+     get_number_of_white_neighbors(board, x, y) == 1)
   {
-    return board;
+    set_all_neighbors_dot(board, x, y);
   }
-
-  if(get_number_of_white_neighbors(board, x, y) != 1)
-  {
-    return board;
-  }
-
-  set_all_neighbors_dot(board, x, y);
-  
   return board;
 }
 
 function solve_tiles_without_white_dot_or_number_neighbors(board, x, y)
 {
-  if(get_number_of_white_neighbors(board, x, y) != 0)
+  if(get_number_of_white_neighbors(board, x, y) == 0 &&
+     get_number_of_dot_neighbors(board, x, y) == 0 &&
+     get_number_of_number_neighbors(board, x, y) == 0)
   {
-    return board;
+    set_board_tile_black(board, x, y);
   }
-
-  if(get_number_of_dot_neighbors(board, x, y) != 0)
-  {
-    return board;
-  }
-
-  if(get_number_of_number_neighbors(board, x, y) != 0)
-  {
-    return board;
-  }
-
-  set_board_tile_black(board, x, y);
-
   return board;
 }
 
@@ -607,59 +582,39 @@ function solve_white_tiles_that_could_complete_illegal_black_square(board, x, y)
 
 function solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board, x, y)
 {
-  if(get_number_of_white_neighbors(board, x, y) != 1)
+  if(get_number_of_white_neighbors(board, x, y) == 1 &&
+     get_number_of_dot_neighbors(board, x, y) == 0 &&
+     get_number_of_number_neighbors(board, x, y) == 0)
   {
-    return board;
+    set_all_neighbors_dot(board, x, y);
   }
-
-  if(get_number_of_dot_neighbors(board, x, y) != 0)
-  {
-    return board;
-  }
-
-  if(get_number_of_number_neighbors(board, x, y) != 0)
-  {
-    return board;
-  }
-
-  set_all_neighbors_dot(board, x, y);
-  
   return board;
 }
 
 function surround_complete_white_pools_with_black_tiles(board, x, y)
 {
-  if(board[x][y] != get_white_pool_size(board, x, y))
+  if(board[x][y] == get_white_pool_size(board, x, y))
   {
-    return board;
-  }
-
-  set_all_white_pool_neighbors_black(board, x, y);
-  
+    set_all_white_pool_neighbors_black(board, x, y);
+  }  
   return board;
 }
 
 function extend_black_pools_with_one_white_neighbor(board, x, y)
 {
-  if(get_black_pool_white_neighbors(board, x, y).length != 1)
+  if(get_black_pool_white_neighbors(board, x, y).length == 1)
   {
-    return board;
+    set_all_black_pool_neighbors_black(board, x, y);
   }
-
-  set_all_black_pool_neighbors_black(board, x, y);
-
   return board;
 }
 
 function extend_uncomplete_white_pools_with_one_white_neighbor(board, x, y)
 {
-  if(get_white_pool_white_neighbors(board, x, y).length != 1)
+  if(get_white_pool_white_neighbors(board, x, y).length == 1)
   {
-    return board;
+    set_all_white_pool_neighbors_dot(board, x, y);
   }
-
-  set_all_white_pool_neighbors_dot(board, x, y);
-  
   return board;
 }
 
@@ -669,7 +624,6 @@ function set_board_tile_black(board, x, y)
   {
     board[x][y] = B;
   }
-  
   return board;
 }
 
@@ -679,7 +633,6 @@ function set_board_tile_dot(board, x, y)
   {
     board[x][y] = D;
   }
-  
   return board;
 }
 
@@ -701,71 +654,44 @@ function set_all_neighbors_dot(board, x, y)
 
 function is_valid_tile(board, x , y)
 {
-  if(x < 0 || x >= board.length)
-  {
-    return false;
-  }
-  
-  if(y < 0 || y >= board.length)
-  {
-    return false;
-  }
-  
-  return true;
+  return x >= 0 &&
+         y >= 0 &&
+         x < board.length &&
+         y < board.length;
 }
 
 function is_white_tile(board, x , y)
 {
-  if(!is_valid_tile(board, x , y))
-  {
-    return false;
-  }
-  
-  return board[x][y] == W;
+  return is_valid_tile(board, x , y) &&
+         board[x][y] == W;
 }
 
 function is_black_tile(board, x , y)
 {
-  if(!is_valid_tile(board, x , y))
-  {
-    return false;
-  }
-  
-  return board[x][y] == B;
+  return is_valid_tile(board, x , y) &&
+         board[x][y] == B;
 }
 
 function is_dot_tile(board, x , y)
 {
-  if(!is_valid_tile(board, x , y))
-  {
-    return false;
-  }
-  
-  return board[x][y] == D;
+  return is_valid_tile(board, x , y) &&
+         board[x][y] == D;
 }
 
 function is_number_tile(board, x ,y)
 {
-  if(!is_valid_tile(board, x , y))
-  {
-    return false;
-  }
-  
-  return board[x][y] >= 1;
+  return is_valid_tile(board, x , y) &&
+         board[x][y] >= 1;
 }
 
 function is_white_pool_tile(board, x, y)
 {
-  return is_dot_tile(board, x ,y) || is_number_tile(board, x ,y);
+  return is_dot_tile(board, x ,y) || 
+         is_number_tile(board, x ,y);
 }
 
 function white_tile_could_complete_illegal_black_square(board, x, y)
-{
-  if(!is_white_tile(board, x, y))
-  {
-    return false;
-  }
-  
+{  
   //Would complete top left corner?
   if(is_black_tile(board, x+1, y+1) &&
      is_black_tile(board, x+1, y) &&
