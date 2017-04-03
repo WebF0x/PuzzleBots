@@ -19,19 +19,23 @@ D = -2; //Dot tile
   run_all_tests();
   
   var html_board = get_html_board();
-  solve_functions = [solve_tiles_numbered_1,
-                     solve_white_tiles_between_numbers,
-                     solve_numbers_touching_by_corners,
-                     solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles,
-                     solve_number_tile_touching_only_one_white_tile_and_no_dots,
-                     solve_tiles_without_white_dot_or_number_neighbors,
-                     solve_white_tiles_that_could_complete_illegal_black_square,
-                     solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles,
-                     surround_complete_white_pools_with_black_tiles,
-                     extend_black_pools_with_one_white_neighbor,
-                     extend_uncomplete_white_pools_with_one_white_neighbor];
   
-  solve_html_board(html_board, solve_functions);
+  var number_solve_functions = [solve_tiles_numbered_1,
+                            solve_numbers_touching_by_corners,
+                            solve_number_tile_touching_only_one_white_tile_and_no_dots,
+                            surround_complete_white_pools_with_black_tiles,
+                            extend_uncomplete_white_pools_with_one_white_neighbor];
+  
+  var white_solve_functions = [solve_white_tiles_between_numbers,
+                           solve_tiles_without_white_dot_or_number_neighbors,
+                           solve_white_tiles_that_could_complete_illegal_black_square];
+  
+  var black_solve_functions = [solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles,
+                           extend_black_pools_with_one_white_neighbor];
+  
+  var dot_solve_functions = [solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles];
+  
+  solve_html_board(html_board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
 })();
 
 function run_all_tests()
@@ -50,6 +54,10 @@ function run_all_tests()
   test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black();
   test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_dot();
   test_when_solving_board_then_keep_trying_as_long_as_you_progress();
+  test_when_solving_board_then_call_solve_number_functions_on_each_number_tile();
+  test_when_solving_board_then_call_solve_white_functions_on_each_white_tile();
+  test_when_solving_board_then_call_solve_black_functions_on_each_black_tile();
+  test_when_solving_board_then_call_solve_dot_functions_on_each_dot_tile();
 }
 
 function test_when_number_is_1_then_mark_all_sides_as_black()
@@ -66,7 +74,7 @@ function test_when_number_is_1_then_mark_all_sides_as_black()
       [W, B, W]
     ];
   
-  var solved_board = solve_tiles_numbered_1(board);
+  var solved_board = solve_tiles_numbered_1(board, 1, 1);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles touching a '1' should be marked as black");
 }
@@ -85,7 +93,8 @@ function test_when_white_tile_between_two_numbers_then_mark_black()
       [2, W, W]
     ];
   
-  var solved_board = solve_white_tiles_between_numbers(board);
+  var solved_board = solve_white_tiles_between_numbers(board, 0, 1);
+  solved_board = solve_white_tiles_between_numbers(solved_board, 1, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers should be marked as black");
 }
@@ -104,7 +113,9 @@ function test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black()
       [2, B, W]
     ];
   
-  var solved_board = solve_numbers_touching_by_corners(board);
+  var solved_board = solve_numbers_touching_by_corners(board, 0, 0);
+  solved_board = solve_numbers_touching_by_corners(solved_board, 1, 1);
+  solved_board = solve_numbers_touching_by_corners(solved_board, 2, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "Tiles between numbers touching by corner should be marked as black");
 }
@@ -123,7 +134,7 @@ function test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mar
       [1, B, 1]
     ];
   
-  var solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board);
+  var solved_board = solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board, 1, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When black tile touches only one white tile, it should be marked as black");
 }
@@ -142,7 +153,7 @@ function test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then
       [B, B, B]
     ];
   
-  var solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(board);
+  var solved_board = solve_number_tile_touching_only_one_white_tile_and_no_dots(board, 1, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When number tile touches only one white tile and no dots, it should be marked as dot");
 }
@@ -161,7 +172,7 @@ function test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_
       [B, 2, W]
     ];
   
-  var solved_board = solve_tiles_without_white_dot_or_number_neighbors(board);
+  var solved_board = solve_tiles_without_white_dot_or_number_neighbors(board, 1, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When white tile has no white, dot or number neighbors, it should be marked as black");
 }
@@ -180,7 +191,7 @@ function test_when_white_tile_could_complete_illegal_black_square_then_mark_it_a
       [W, W, W]
     ];
   
-  var solved_board = solve_white_tiles_that_could_complete_illegal_black_square(board);
+  var solved_board = solve_white_tiles_that_could_complete_illegal_black_square(board, 1, 1);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a white could complete an illegal black square, it should be marked as dot");
 }
@@ -199,7 +210,8 @@ function test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_ma
       [B, B, D]
     ];
   
-  var solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board);
+  var solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board, 2, 2);
+  solved_board = solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(solved_board, 0, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a dot touches a single white tile and no dot tiles and no number tiles, the white tile should be marked as dot");
 }
@@ -232,7 +244,7 @@ function test_when_white_pool_is_complete_then_surround_with_black_tiles()
       [B, W, W]
     ];
   
-  var solved_board = surround_complete_white_pools_with_black_tiles(board);
+  var solved_board = surround_complete_white_pools_with_black_tiles(board, 0, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a white pool is complete, the surrounding tiles should be marked as black");
 }
@@ -265,7 +277,7 @@ function test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black()
       [W, B, B]
     ];
   
-  var solved_board = extend_black_pools_with_one_white_neighbor(board);
+  var solved_board = extend_black_pools_with_one_white_neighbor(board, 0, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When a black pool touches only one white tile, that tile should be marked as black");
 }
@@ -284,7 +296,7 @@ function test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_d
       [3, B, B]
     ];
   
-  var solved_board = extend_uncomplete_white_pools_with_one_white_neighbor(board);
+  var solved_board = extend_uncomplete_white_pools_with_one_white_neighbor(board, 2, 0);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When an uncomplete white pool touches only one white tile, that tile should be marked as dot");
 }
@@ -292,7 +304,7 @@ function test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_d
 function test_when_solving_board_then_keep_trying_as_long_as_you_progress()
 {
   var mock_solve_function_has_been_called_before = false;
-  function mock_solve_function_requiring_two_runs(board)
+  function mock_solve_function_requiring_two_runs(board, x, y)
   {
     if(!mock_solve_function_has_been_called_before)
     {
@@ -322,313 +334,331 @@ function test_when_solving_board_then_keep_trying_as_long_as_you_progress()
       [B, B]
     ];
   
-  var solved_board = solve(board, [mock_solve_function_requiring_two_runs]);
+  var solved_board = solve(board, [mock_solve_function_requiring_two_runs], [], [], []);
   
   assert(are_arrays_equal(expected_solved_board, solved_board), "When solving the board, keep solving as long as there is progress");
+}
+
+function test_when_solving_board_then_call_solve_number_functions_on_each_number_tile()
+{
+  var mock_solve_function_has_been_called_before = false;
+  function mock_solve_function(board, x, y)
+  {
+    assert(is_number_tile(board, x, y), "When attempting to solve a number tile, it should actually be a number");
+    mock_solve_function_has_been_called_before = true;
+    return board;
+  }
+  
+  var board = [
+      [1, W],
+      [D, B]
+    ];
+  
+  solve(board, [mock_solve_function], [], [], []);
+  
+  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each number tile");
+}
+
+function test_when_solving_board_then_call_solve_white_functions_on_each_white_tile()
+{
+  var mock_solve_function_has_been_called_before = false;
+  function mock_solve_function(board, x, y)
+  {
+    assert(is_white_tile(board, x, y), "When attempting to solve a white tile, it should actually be white");
+    mock_solve_function_has_been_called_before = true;
+    return board;
+  }
+  
+  var board = [
+      [1, W],
+      [D, B]
+    ];
+  
+  solve(board, [], [mock_solve_function], [], []);
+  
+  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each white tile");
+}
+
+function test_when_solving_board_then_call_solve_black_functions_on_each_black_tile()
+{
+  var mock_solve_function_has_been_called_before = false;
+  function mock_solve_function(board, x, y)
+  {
+    assert(is_black_tile(board, x, y), "When attempting to solve a black tile, it should actually be black");
+    mock_solve_function_has_been_called_before = true;
+    return board;
+  }
+  
+  var board = [
+      [1, W],
+      [D, B]
+    ];
+  
+  solve(board, [], [], [mock_solve_function], []);
+  
+  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each black tile");
+}
+
+function test_when_solving_board_then_call_solve_dot_functions_on_each_dot_tile()
+{
+  var mock_solve_function_has_been_called_before = false;
+  function mock_solve_function(board, x, y)
+  {
+    assert(is_dot_tile(board, x, y), "When attempting to solve a dot tile, it should actually be a dot");
+    mock_solve_function_has_been_called_before = true;
+    return board;
+  }
+  
+  var board = [
+      [1, W],
+      [D, B]
+    ];
+  
+  solve(board, [], [], [], [mock_solve_function]);
+  
+  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each dot tile");
 }
 
 ///////////
 // Board //
 ///////////
 
-function solve(board, solve_functions)
+function solve(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
 {
   var initial_board = [];
   
   while(!are_arrays_equal(board, initial_board))
   {    
     initial_board = copy_array(board);
-    for(var solve_function of solve_functions)
+    board = solve_all_tiles(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
+  }
+  
+  return board;
+}
+
+function solve_all_tiles(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
+{
+  for(var i=0; i<board.length; i++)
+  {
+    for(var j=0; j<board.length; j++)
     {
-      board = solve_function(board);
+      board = solve_tile(board, i, j, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
     }
   }
   
   return board;
 }
 
-function solve_tiles_numbered_1(board)
+function solve_tile(board, x, y, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
 {
-  for(var i=0; i<board.length; i++)
+  if(is_number_tile(board, x, y))
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(board[i][j] == 1)
-      {
-        set_all_neighbors_black(board, i, j);
-      }
-    }
+    board = solve_with_each_function(board, x, y, number_solve_functions);
+  }
+
+  if(is_white_tile(board, x, y))
+  {
+    board = solve_with_each_function(board, x, y, white_solve_functions);
+  }
+  
+  if(is_black_tile(board, x, y))
+  {
+    board = solve_with_each_function(board, x, y, black_solve_functions);
+  }
+  
+  if(is_dot_tile(board, x, y))
+  {
+    board = solve_with_each_function(board, x, y, dot_solve_functions);
   }
   
   return board;
 }
 
-function solve_white_tiles_between_numbers(board)
+function solve_with_each_function(board, x, y, solve_functions)
 {
-  for(var i=0; i<board.length; i++)
+  for(var solve_function of solve_functions)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(board[i][j] != W)
-      {
-        continue;
-      }
-      
-      var is_between_numbers_horizontally =  is_number_tile(board, i-1, j) && is_number_tile(board, i+1, j);
-      var is_between_numbers_vertically =  is_number_tile(board, i, j-1) && is_number_tile(board, i, j+1);
-      var is_between_numbers = is_between_numbers_horizontally || is_between_numbers_vertically;
-      
-      if(is_between_numbers)
-      {
-        board = set_board_tile_black(board, i, j);
-      }
-    }
+    board = solve_function(board, x, y);
   }
   
   return board;
 }
 
-function solve_numbers_touching_by_corners(board)
+function solve_tiles_numbered_1(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(board[x][y] == 1)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_number_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      var is_bottom_left_tile_a_number = is_number_tile(board, i-1, j+1);
-      var is_bottom_right_tile_a_number = is_number_tile(board, i+1, j+1);
-      
-      if(is_bottom_left_tile_a_number)
-      {
-        set_board_tile_black(board, i-1, j);
-        set_board_tile_black(board, i, j+1);
-      }
-      
-      if(is_bottom_right_tile_a_number)
-      {
-        set_board_tile_black(board, i+1, j);
-        set_board_tile_black(board, i, j+1);
-      }
-    }
+    set_all_neighbors_black(board, x, y);
+  }
+  return board;
+}
+
+function solve_white_tiles_between_numbers(board, x, y)
+{
+  var is_between_numbers_horizontally =  is_number_tile(board, x-1, y) && is_number_tile(board, x+1, y);
+  var is_between_numbers_vertically =  is_number_tile(board, x, y-1) && is_number_tile(board, x, y+1);
+  var is_between_numbers = is_between_numbers_horizontally || is_between_numbers_vertically;
+
+  if(is_between_numbers)
+  {
+    board = set_board_tile_black(board, x, y);
+  }
+  return board;
+}
+
+function solve_numbers_touching_by_corners(board, x, y)
+{
+  var is_bottom_left_tile_a_number = is_number_tile(board, x-1, y+1);
+  var is_bottom_right_tile_a_number = is_number_tile(board, x+1, y+1);
+  var is_top_left_tile_a_number = is_number_tile(board, x-1, y-1);
+  var is_top_right_tile_a_number = is_number_tile(board, x+1, y-1);
+
+  if(is_bottom_left_tile_a_number)
+  {
+    set_board_tile_black(board, x-1, y);
+    set_board_tile_black(board, x, y+1);
+  }
+
+  if(is_bottom_right_tile_a_number)
+  {
+    set_board_tile_black(board, x+1, y);
+    set_board_tile_black(board, x, y+1);
+  }
+  
+  if(is_top_left_tile_a_number)
+  {
+    set_board_tile_black(board, x-1, y);
+    set_board_tile_black(board, x, y-1);
+  }
+
+  if(is_top_right_tile_a_number)
+  {
+    set_board_tile_black(board, x+1, y);
+    set_board_tile_black(board, x, y-1);
   }
   
   return board;
 }
 
-function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board)
+function solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(get_number_of_white_neighbors(board, x, y) != 1)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_black_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_number_of_white_neighbors(board, i, j) != 1)
-      {
-        continue;
-      }
-      
-      if(get_number_of_black_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      set_all_neighbors_black(board, i, j);
-    }
+    return board;
   }
+
+  if(get_number_of_black_neighbors(board, x, y) != 0)
+  {
+    return board;
+  }
+
+  set_all_neighbors_black(board, x, y);
   
   return board;
 }
 
-function solve_number_tile_touching_only_one_white_tile_and_no_dots(board)
+function solve_number_tile_touching_only_one_white_tile_and_no_dots(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(get_number_of_dot_neighbors(board, x, y) != 0)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_number_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_number_of_dot_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      if(get_number_of_white_neighbors(board, i, j) != 1)
-      {
-        continue;
-      }
-      
-      set_all_neighbors_dot(board, i, j);
-    }
+    return board;
   }
+
+  if(get_number_of_white_neighbors(board, x, y) != 1)
+  {
+    return board;
+  }
+
+  set_all_neighbors_dot(board, x, y);
   
   return board;
 }
 
-function solve_tiles_without_white_dot_or_number_neighbors(board)
+function solve_tiles_without_white_dot_or_number_neighbors(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(get_number_of_white_neighbors(board, x, y) != 0)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_white_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_number_of_white_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      if(get_number_of_dot_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      if(get_number_of_number_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      set_board_tile_black(board, i, j);
-    }
+    return board;
   }
+
+  if(get_number_of_dot_neighbors(board, x, y) != 0)
+  {
+    return board;
+  }
+
+  if(get_number_of_number_neighbors(board, x, y) != 0)
+  {
+    return board;
+  }
+
+  set_board_tile_black(board, x, y);
+
+  return board;
+}
+
+function solve_white_tiles_that_could_complete_illegal_black_square(board, x, y)
+{
+  if(white_tile_could_complete_illegal_black_square(board, x, y))
+  {
+    set_board_tile_dot(board, x, y);
+  }
+  return board;
+}
+
+function solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board, x, y)
+{
+  if(get_number_of_white_neighbors(board, x, y) != 1)
+  {
+    return board;
+  }
+
+  if(get_number_of_dot_neighbors(board, x, y) != 0)
+  {
+    return board;
+  }
+
+  if(get_number_of_number_neighbors(board, x, y) != 0)
+  {
+    return board;
+  }
+
+  set_all_neighbors_dot(board, x, y);
   
   return board;
 }
 
-function solve_white_tiles_that_could_complete_illegal_black_square(board)
+function surround_complete_white_pools_with_black_tiles(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(board[x][y] != get_white_pool_size(board, x, y))
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_white_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(!white_tile_could_complete_illegal_black_square(board, i, j))
-      {
-        continue;
-      }
-      
-      set_board_tile_dot(board, i, j);
-    }
+    return board;
   }
+
+  set_all_white_pool_neighbors_black(board, x, y);
   
   return board;
 }
 
-function solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board)
+function extend_black_pools_with_one_white_neighbor(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(get_black_pool_white_neighbors(board, x, y).length != 1)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_dot_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_number_of_white_neighbors(board, i, j) != 1)
-      {
-        continue;
-      }
-      
-      if(get_number_of_dot_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      if(get_number_of_number_neighbors(board, i, j) != 0)
-      {
-        continue;
-      }
-      
-      set_all_neighbors_dot(board, i, j);
-    }
+    return board;
   }
-  
+
+  set_all_black_pool_neighbors_black(board, x, y);
+
   return board;
 }
 
-function surround_complete_white_pools_with_black_tiles(board)
+function extend_uncomplete_white_pools_with_one_white_neighbor(board, x, y)
 {
-  for(var i=0; i<board.length; i++)
+  if(get_white_pool_white_neighbors(board, x, y).length != 1)
   {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_number_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(board[i][j] != get_white_pool_size(board, i, j))
-      {
-        continue;
-      }
-            
-      set_all_white_pool_neighbors_black(board, i, j);
-    }
+    return board;
   }
-  
-  return board;
-}
 
-function extend_black_pools_with_one_white_neighbor(board)
-{
-  for(var i=0; i<board.length; i++)
-  {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_black_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_black_pool_white_neighbors(board, i, j).length != 1)
-      {
-        continue;
-      }
-            
-      set_all_black_pool_neighbors_black(board, i, j);
-    }
-  }
-  
-  return board;
-}
-
-function extend_uncomplete_white_pools_with_one_white_neighbor(board)
-{
-  for(var i=0; i<board.length; i++)
-  {
-    for(var j=0; j<board.length; j++)
-    {
-      if(!is_number_tile(board, i, j))
-      {
-        continue;
-      }
-      
-      if(get_white_pool_white_neighbors(board, i, j).length != 1)
-      {
-        continue;
-      }
-            
-      set_all_white_pool_neighbors_dot(board, i, j);
-    }
-  }
+  set_all_white_pool_neighbors_dot(board, x, y);
   
   return board;
 }
@@ -958,10 +988,10 @@ function get_black_pool_size(board, x, y)
 // HTML board //
 ////////////////
 
-function solve_html_board(html_board, solve_functions)
+function solve_html_board(html_board, solve_number_functions, solve_white_functions, solve_black_functions, solve_dot_functions)
 {
     var board = get_board_from_html_board(html_board);
-    var solved_board = solve(board, solve_functions);
+    var solved_board = solve(board, solve_number_functions, solve_white_functions, solve_black_functions, solve_dot_functions);
     update_html_board(solved_board);
 }
 
