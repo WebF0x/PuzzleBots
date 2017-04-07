@@ -441,18 +441,15 @@ function solve_tile(board, x, y, number_solve_functions, white_solve_functions, 
   {
     solve_with_each_function(board, x, y, number_solve_functions);
   }
-
-  if(is_white_tile(board, x, y))
+  else if(is_white_tile(board, x, y))
   {
     solve_with_each_function(board, x, y, white_solve_functions);
   }
-  
-  if(is_black_tile(board, x, y))
+  else if(is_black_tile(board, x, y))
   {
     solve_with_each_function(board, x, y, black_solve_functions);
   }
-  
-  if(is_dot_tile(board, x, y))
+  else if(is_dot_tile(board, x, y))
   {
     solve_with_each_function(board, x, y, dot_solve_functions);
   }
