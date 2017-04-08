@@ -10,9 +10,9 @@
    - Two numbers cannot be in the same white pool
 */
 
-W = 0; //White tile
-B = -1; //Black tile
-D = -2; //Dot tile
+const W = 0; //White tile
+const B = -1; //Black tile
+const D = -2; //Dot tile
 
 (function main()
 {
