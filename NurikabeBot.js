@@ -11,9 +11,9 @@
    - There can be no square of 4 black tiles
 */
 
-const W = 0; //White tile
-const B = -1; //Black tile
-const D = -2; //Dot tile
+var W = 0; //White tile
+var B = -1; //Black tile
+var D = -2; //Dot tile
 
 (function main()
 {
