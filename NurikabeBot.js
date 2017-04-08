@@ -8,6 +8,7 @@
    - All black squares must be contiguous (diagonally doesn't count)
    - A tile numbered N must be in a white pool of N contiguous tiles
    - Two numbers cannot be in the same white pool
+   - There can be no square of 4 black tiles
 */
 
 const W = 0; //White tile
