@@ -20,22 +20,34 @@ D = -2; //Dot tile
   
   var html_board = get_html_board();
   
-  var number_solve_functions = [solve_tiles_numbered_1,
-                            solve_numbers_touching_by_corners,
-                            solve_number_tile_touching_only_one_white_tile_and_no_dots,
-                            surround_complete_white_pools_with_black_tiles,
-                            extend_uncomplete_white_pools_with_one_white_neighbor];
+  var number_solve_functions = [
+    solve_tiles_numbered_1,
+    solve_numbers_touching_by_corners,
+    solve_number_tile_touching_only_one_white_tile_and_no_dots,
+    surround_complete_white_pools_with_black_tiles,
+    extend_uncomplete_white_pools_with_one_white_neighbor
+  ];
   
-  var white_solve_functions = [solve_white_tiles_between_numbers,
-                           solve_tiles_without_white_dot_or_number_neighbors,
-                           solve_white_tiles_that_could_complete_illegal_black_square];
+  var white_solve_functions = [
+    solve_white_tiles_between_numbers,
+    solve_tiles_without_white_dot_or_number_neighbors,
+    solve_white_tiles_that_could_complete_illegal_black_square
+  ];
   
-  var black_solve_functions = [solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles,
-                           extend_black_pools_with_one_white_neighbor];
+  var black_solve_functions = [
+    solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles,
+    extend_black_pools_with_one_white_neighbor
+  ];
   
-  var dot_solve_functions = [solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles];
+  var dot_solve_functions = [
+    solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles
+  ];
   
-  solve_html_board(html_board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
+  solve_html_board(html_board, 
+                   number_solve_functions,
+                   white_solve_functions,
+                   black_solve_functions,
+                   dot_solve_functions);
 })();
 
 function run_all_tests()
@@ -63,242 +75,260 @@ function run_all_tests()
 function test_when_number_is_1_then_mark_all_sides_as_black()
 {
   var board = [
-      [W, W, W],
-      [W, 1, W],
-      [W, W, W]
-    ];
+    [W, W, W],
+    [W, 1, W],
+    [W, W, W]
+  ];
   
   var expected_board = [
-      [W, B, W],
-      [B, 1, B],
-      [W, B, W]
-    ];
+    [W, B, W],
+    [B, 1, B],
+    [W, B, W]
+  ];
   
   solve_tiles_numbered_1(board, 1, 1);
   
-  assert(are_arrays_equal(expected_board, board), "Tiles touching a '1' should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "Tiles touching a '1' should be marked as black");
 }
 
 function test_when_white_tile_between_two_numbers_then_mark_black()
 {
   var board = [
-      [2, W, 2],
-      [W, W, W],
-      [2, W, W]
-    ];
+    [2, W, 2],
+    [W, W, W],
+    [2, W, W]
+  ];
   
   var expected_board = [
-      [2, B, 2],
-      [B, W, W],
-      [2, W, W]
-    ];
+    [2, B, 2],
+    [B, W, W],
+    [2, W, W]
+  ];
   
   solve_white_tiles_between_numbers(board, 0, 1);
   solve_white_tiles_between_numbers(board, 1, 0);
   
-  assert(are_arrays_equal(expected_board, board), "Tiles between numbers should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "Tiles between numbers should be marked as black");
 }
 
 function test_when_numbers_touch_by_corner_then_mark_inbetween_tiles_black()
 {
    var board = [
-      [2, W, W],
-      [W, 2, W],
-      [2, W, W]
-    ];
+     [2, W, W],
+     [W, 2, W],
+     [2, W, W]
+   ];
   
   var expected_board = [
-      [2, B, W],
-      [B, 2, W],
-      [2, B, W]
-    ];
+    [2, B, W],
+    [B, 2, W],
+    [2, B, W]
+  ];
   
   solve_numbers_touching_by_corners(board, 0, 0);
   solve_numbers_touching_by_corners(board, 1, 1);
   solve_numbers_touching_by_corners(board, 2, 0);
   
-  assert(are_arrays_equal(expected_board, board), "Tiles between numbers touching by corner should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "Tiles between numbers touching by corner should be marked as black");
 }
 
 function test_when_black_tile_touches_only_one_white_tile_and_no_black_tiles_mark_it_black()
 {
    var board = [
-      [2, W, B],
-      [B, W, B],
-      [1, B, 1]
-    ];
+     [2, W, B],
+     [B, W, B],
+     [1, B, 1]
+   ];
   
   var expected_board = [
-      [2, W, B],
-      [B, B, B],
-      [1, B, 1]
-    ];
+    [2, W, B],
+    [B, B, B],
+    [1, B, 1]
+  ];
   
   solve_black_tiles_touching_only_one_white_tile_and_no_black_tiles(board, 1, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When black tile touches only one white tile, it should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "When black tile touches only one white tile, it should be marked as black");
 }
 
 function test_when_number_tile_touches_only_one_white_tile_and_no_dots_tile_then_mark_it_dot()
 {
   var board = [
-      [B, W, W],
-      [3, W, W],
-      [B, B, B]
-    ];
+    [B, W, W],
+    [3, W, W],
+    [B, B, B]
+  ];
   
   var expected_board = [
-      [B, W, W],
-      [3, D, W],
-      [B, B, B]
-    ];
+    [B, W, W],
+    [3, D, W],
+    [B, B, B]
+  ];
   
   solve_number_tile_touching_only_one_white_tile_and_no_dots(board, 1, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When number tile touches only one white tile and no dots, it should be marked as dot");
+  assert(are_arrays_equal(expected_board, board), 
+         "When number tile touches only one white tile and no dots, " +
+         "it should be marked as dot");
 }
 
 function test_when_white_tile_has_no_white_dot_or_number_neighbors_then_mark_as_black()
 {
   var board = [
-      [B, D, W],
-      [W, B, W],
-      [B, 2, W]
-    ];
+    [B, D, W],
+    [W, B, W],
+    [B, 2, W]
+  ];
   
   var expected_board = [
-      [B, D, W],
-      [B, B, W],
-      [B, 2, W]
-    ];
+    [B, D, W],
+    [B, B, W],
+    [B, 2, W]
+  ];
   
   solve_tiles_without_white_dot_or_number_neighbors(board, 1, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When white tile has no white, dot or number neighbors, it should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "When white tile has no white, dot or number neighbors, " + 
+         "it should be marked as black");
 }
 
 function test_when_white_tile_could_complete_illegal_black_square_then_mark_it_as_dot()
 {
   var board = [
-      [W, B, B],
-      [W, W, B],
-      [W, W, W]
-    ];
+    [W, B, B],
+    [W, W, B],
+    [W, W, W]
+  ];
   
   var expected_board = [
-      [W, B, B],
-      [W, D, B],
-      [W, W, W]
-    ];
+    [W, B, B],
+    [W, D, B],
+    [W, W, W]
+  ];
   
   solve_white_tiles_that_could_complete_illegal_black_square(board, 1, 1);
   
-  assert(are_arrays_equal(expected_board, board), "When a white could complete an illegal black square, it should be marked as dot");
+  assert(are_arrays_equal(expected_board, board), 
+         "When a white could complete an illegal black square, it should be marked as dot");
 }
 
 function test_when_dot_tile_touches_one_white_no_dot_and_no_number_tiles_then_mark_dot()
 {
   var board = [
-      [D, W, W],
-      [2, W, W],
-      [B, B, D]
-    ];
+    [D, W, W],
+    [2, W, W],
+    [B, B, D]
+  ];
   
   var expected_board = [
-      [D, W, W],
-      [2, W, D],
-      [B, B, D]
-    ];
+    [D, W, W],
+    [2, W, D],
+    [B, B, D]
+  ];
   
   solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board, 2, 2);
   solve_dot_tiles_touching_one_white_no_dot_and_no_number_tiles(board, 0, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When a dot touches a single white tile and no dot tiles and no number tiles, the white tile should be marked as dot");
+  assert(are_arrays_equal(expected_board, board), 
+         "When a dot touches a single white tile and no dot tiles and no number tiles, " + 
+         "then the white tile should be marked as dot");
 }
 
 function test_get_white_pool_size()
 {
   var board = [
-      [D, W, B],
-      [5, D, B],
-      [W, D, B]
-    ];
+    [D, W, B],
+    [5, D, B],
+    [W, D, B]
+  ];
   
   var expected_pool_size = 4;
   var pool_size = get_white_pool_size(board, 0, 0);
   
-  assert((expected_pool_size == pool_size), "White pool size should include the number tile and all the dot tiles in the same pool");
+  assert((expected_pool_size == pool_size), 
+         "White pool size should include the number tile and " +
+         "all the dot tiles in the same pool");
 }
 
 function test_when_white_pool_is_complete_then_surround_with_black_tiles()
 {
   var board = [
-      [2, W, W],
-      [D, W, W],
-      [W, W, W]
-    ];
+    [2, W, W],
+    [D, W, W],
+    [W, W, W]
+  ];
   
   var expected_board = [
-      [2, B, W],
-      [D, B, W],
-      [B, W, W]
-    ];
+    [2, B, W],
+    [D, B, W],
+    [B, W, W]
+  ];
   
   surround_complete_white_pools_with_black_tiles(board, 0, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When a white pool is complete, the surrounding tiles should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "When a white pool is complete, the surrounding tiles should be marked as black");
 }
 
 function test_get_black_pool_size()
 {
   var board = [
-      [D, W, B],
-      [5, D, B],
-      [W, D, B]
-    ];
+    [D, W, B],
+    [5, D, B],
+    [W, D, B]
+  ];
   
   var expected_pool_size = 3;
   var pool_size = get_black_pool_size(board, 2, 2);
   
-  assert((expected_pool_size == pool_size), "Black pool size should include the number of black tiles");
+  assert((expected_pool_size == pool_size), 
+         "Black pool size should include the number of black tiles");
 }
 
 function test_when_black_pool_has_only_one_white_neighbor_then_mark_it_black()
 {
   var board = [
-      [B, W, W],
-      [D, W, W],
-      [W, B, B]
-    ];
+    [B, W, W],
+    [D, W, W],
+    [W, B, B]
+  ];
   
   var expected_board = [
-      [B, B, W],
-      [D, W, W],
-      [W, B, B]
-    ];
+    [B, B, W],
+    [D, W, W],
+    [W, B, B]
+  ];
   
   extend_black_pools_with_one_white_neighbor(board, 0, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When a black pool touches only one white tile, that tile should be marked as black");
+  assert(are_arrays_equal(expected_board, board), 
+         "When a black pool touches only one white tile, that tile should be marked as black");
 }
 
 function test_when_uncomplete_white_pool_has_only_one_white_neighbor_then_mark_dot()
 {
   var board = [
-      [B, B, B],
-      [D, W, W],
-      [3, B, B]
-    ];
+    [B, B, B],
+    [D, W, W],
+    [3, B, B]
+  ];
   
   var expected_board = [
-      [B, B, B],
-      [D, D, W],
-      [3, B, B]
-    ];
+    [B, B, B],
+    [D, D, W],
+    [3, B, B]
+  ];
   
   extend_uncomplete_white_pools_with_one_white_neighbor(board, 2, 0);
   
-  assert(are_arrays_equal(expected_board, board), "When an uncomplete white pool touches only one white tile, that tile should be marked as dot");
+  assert(are_arrays_equal(expected_board, board), 
+         "When an uncomplete white pool touches only one white tile, " + 
+         "that tile should be marked as dot");
 }
 
 function test_when_solving_board_then_keep_trying_as_long_as_you_progress()
@@ -319,18 +349,19 @@ function test_when_solving_board_then_keep_trying_as_long_as_you_progress()
   }
   
   var board = [
-      [1, W],
-      [W, W]
-    ];
+    [1, W],
+    [W, W]
+  ];
   
   var expected_board = [
-      [1, B],
-      [B, B]
-    ];
+    [1, B],
+    [B, B]
+  ];
   
   solve(board, [mock_solve_function_requiring_two_runs], [], [], []);
   
-  assert(are_arrays_equal(expected_board, board), "When solving the board, keep solving as long as there is progress");
+  assert(are_arrays_equal(expected_board, board), 
+         "When solving the board, keep solving as long as there is progress");
 }
 
 function test_when_solving_board_then_call_solve_number_functions_on_each_number_tile()
@@ -338,18 +369,20 @@ function test_when_solving_board_then_call_solve_number_functions_on_each_number
   var mock_solve_function_has_been_called_before = false;
   function mock_solve_function(board, x, y)
   {
-    assert(is_number_tile(board, x, y), "When attempting to solve a number tile, it should actually be a number");
+    assert(is_number_tile(board, x, y), 
+           "When attempting to solve a number tile, it should actually be a number");
     mock_solve_function_has_been_called_before = true;
   }
   
   var board = [
-      [1, W],
-      [D, B]
-    ];
+    [1, W],
+    [D, B]
+  ];
   
   solve(board, [mock_solve_function], [], [], []);
   
-  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each number tile");
+  assert(mock_solve_function_has_been_called_before, 
+         "When solving the board, we should attempt to solve each number tile");
 }
 
 function test_when_solving_board_then_call_solve_white_functions_on_each_white_tile()
@@ -357,18 +390,20 @@ function test_when_solving_board_then_call_solve_white_functions_on_each_white_t
   var mock_solve_function_has_been_called_before = false;
   function mock_solve_function(board, x, y)
   {
-    assert(is_white_tile(board, x, y), "When attempting to solve a white tile, it should actually be white");
+    assert(is_white_tile(board, x, y), 
+           "When attempting to solve a white tile, it should actually be white");
     mock_solve_function_has_been_called_before = true;
   }
   
   var board = [
-      [1, W],
-      [D, B]
-    ];
+    [1, W],
+    [D, B]
+  ];
   
   solve(board, [], [mock_solve_function], [], []);
   
-  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each white tile");
+  assert(mock_solve_function_has_been_called_before, 
+         "When solving the board, we should attempt to solve each white tile");
 }
 
 function test_when_solving_board_then_call_solve_black_functions_on_each_black_tile()
@@ -376,18 +411,20 @@ function test_when_solving_board_then_call_solve_black_functions_on_each_black_t
   var mock_solve_function_has_been_called_before = false;
   function mock_solve_function(board, x, y)
   {
-    assert(is_black_tile(board, x, y), "When attempting to solve a black tile, it should actually be black");
+    assert(is_black_tile(board, x, y), 
+           "When attempting to solve a black tile, it should actually be black");
     mock_solve_function_has_been_called_before = true;
   }
   
   var board = [
-      [1, W],
-      [D, B]
-    ];
+    [1, W],
+    [D, B]
+  ];
   
   solve(board, [], [], [mock_solve_function], []);
   
-  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each black tile");
+  assert(mock_solve_function_has_been_called_before, 
+         "When solving the board, we should attempt to solve each black tile");
 }
 
 function test_when_solving_board_then_call_solve_dot_functions_on_each_dot_tile()
@@ -395,47 +432,74 @@ function test_when_solving_board_then_call_solve_dot_functions_on_each_dot_tile(
   var mock_solve_function_has_been_called_before = false;
   function mock_solve_function(board, x, y)
   {
-    assert(is_dot_tile(board, x, y), "When attempting to solve a dot tile, it should actually be a dot");
+    assert(is_dot_tile(board, x, y), 
+           "When attempting to solve a dot tile, it should actually be a dot");
     mock_solve_function_has_been_called_before = true;
   }
   
   var board = [
-      [1, W],
-      [D, B]
-    ];
+    [1, W],
+    [D, B]
+  ];
   
   solve(board, [], [], [], [mock_solve_function]);
   
-  assert(mock_solve_function_has_been_called_before, "When solving the board, we should attempt to solve each dot tile");
+  assert(mock_solve_function_has_been_called_before, 
+         "When solving the board, we should attempt to solve each dot tile");
 }
 
 ///////////
 // Board //
 ///////////
 
-function solve(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
+function solve(board, 
+                number_solve_functions, 
+                white_solve_functions, 
+                black_solve_functions, 
+                dot_solve_functions)
 {
   var initial_board = [];
   
   while(!are_arrays_equal(board, initial_board))
   {    
     initial_board = copy_array(board);
-    solve_all_tiles(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
+    solve_all_tiles(
+      board, 
+      number_solve_functions, 
+      white_solve_functions, 
+      black_solve_functions, 
+      dot_solve_functions);
   }
 }
 
-function solve_all_tiles(board, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
+function solve_all_tiles(board,
+                         number_solve_functions, 
+                         white_solve_functions, 
+                         black_solve_functions, 
+                         dot_solve_functions)
 {
   for(var i=0; i<board.length; i++)
   {
     for(var j=0; j<board.length; j++)
     {
-      solve_tile(board, i, j, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions);
+      solve_tile(board, 
+                 i, 
+                 j, 
+                 number_solve_functions, 
+                 white_solve_functions, 
+                 black_solve_functions, 
+                 dot_solve_functions);
     }
   }
 }
 
-function solve_tile(board, x, y, number_solve_functions, white_solve_functions, black_solve_functions, dot_solve_functions)
+function solve_tile(board, 
+                     x, 
+                     y, 
+                     number_solve_functions, 
+                     white_solve_functions,
+                     black_solve_functions,
+                     dot_solve_functions)
 {
   if(is_number_tile(board, x, y))
   {
@@ -473,10 +537,12 @@ function solve_tiles_numbered_1(board, x, y)
 
 function solve_white_tiles_between_numbers(board, x, y)
 {
-  var is_between_numbers_horizontally =  is_number_tile(board, x-1, y) && is_number_tile(board, x+1, y);
-  var is_between_numbers_vertically =  is_number_tile(board, x, y-1) && is_number_tile(board, x, y+1);
-  var is_between_numbers = is_between_numbers_horizontally || is_between_numbers_vertically;
-
+  var is_between_numbers_horizontally = is_number_tile(board, x-1, y) && 
+                                        is_number_tile(board, x+1, y);
+  var is_between_numbers_vertically = is_number_tile(board, x, y-1) && 
+                                      is_number_tile(board, x, y+1);
+  var is_between_numbers = is_between_numbers_horizontally || 
+                           is_between_numbers_vertically;
   if(is_between_numbers)
   {
     set_board_tile_black(board, x, y);
@@ -657,39 +723,23 @@ function is_white_pool_tile(board, x, y)
 
 function white_tile_could_complete_illegal_black_square(board, x, y)
 {  
-  //Would complete top left corner?
-  if(is_black_tile(board, x+1, y+1) &&
-     is_black_tile(board, x+1, y) &&
-     is_black_tile(board, x, y+1))
-  {
-    return true;
-  }
+  var would_complete_top_left_corner = is_black_tile(board, x+1, y+1) &&
+                                       is_black_tile(board, x+1, y) &&
+                                       is_black_tile(board, x, y+1);
+  var would_complete_top_right_corner = is_black_tile(board, x-1, y+1) &&
+                                        is_black_tile(board, x-1, y) &&
+                                        is_black_tile(board, x, y+1);
+  var would_complete_bot_left_corner = is_black_tile(board, x+1, y-1) &&
+                                       is_black_tile(board, x+1, y) &&
+                                       is_black_tile(board, x, y-1);
+  var would_complete_bot_right_corner = is_black_tile(board, x-1, y-1) &&
+                                        is_black_tile(board, x-1, y) &&
+                                        is_black_tile(board, x, y-1);
   
-  //Would complete top right corner?
-  if(is_black_tile(board, x-1, y+1) &&
-     is_black_tile(board, x-1, y) &&
-     is_black_tile(board, x, y+1))
-  {
-    return true;
-  }
-  
-  //Would complete bot left corner?
-  if(is_black_tile(board, x+1, y-1) &&
-     is_black_tile(board, x+1, y) &&
-     is_black_tile(board, x, y-1))
-  {
-    return true;
-  }
-  
-  //Would complete bot right corner?
-  if(is_black_tile(board, x-1, y-1) &&
-     is_black_tile(board, x-1, y) &&
-     is_black_tile(board, x, y-1))
-  {
-    return true;
-  }
-    
-  return false;
+  return would_complete_top_left_corner ||
+         would_complete_top_right_corner ||
+         would_complete_bot_left_corner ||
+         would_complete_bot_right_corner;
 }
 
 function get_neighbors(x, y)
@@ -879,10 +929,18 @@ function get_black_pool_size(board, x, y)
 // HTML board //
 ////////////////
 
-function solve_html_board(html_board, solve_number_functions, solve_white_functions, solve_black_functions, solve_dot_functions)
+function solve_html_board(html_board, 
+                          solve_number_functions,
+                          solve_white_functions,
+                          solve_black_functions,
+                          solve_dot_functions)
 {
     var board = get_board_from_html_board(html_board);
-    solve(board, solve_number_functions, solve_white_functions, solve_black_functions, solve_dot_functions);
+    solve(board, 
+          solve_number_functions,
+          solve_white_functions,
+          solve_black_functions,
+          solve_dot_functions);
     update_html_board(board);
 }
 
