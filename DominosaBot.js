@@ -1,5 +1,17 @@
 var CYCLE_HIGHLIGHTER_KEY_CODE = 70;
 
+if(!has_run_before)
+{
+  var has_run_before = false;
+}
+
+(function main()
+{
+  if(!has_run_before)
+    document.addEventListener("keyup", key_up, false);
+  has_run_before = true;
+})();
+
 function key_up(event)
 {
   if(event.keyCode == CYCLE_HIGHLIGHTER_KEY_CODE)
@@ -59,5 +71,3 @@ function reset_highlighter_index()
   right_select.selectedIndex = 2;
   highlightNumber();
 }
-
-document.addEventListener("keyup", key_up, false)
