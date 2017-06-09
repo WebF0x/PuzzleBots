@@ -38,6 +38,18 @@ function key_up(event)
   } 
 }
 
+function get_max_highlighter_index(left_or_right)
+{
+  const left_highlighter_select = get_highlighter_select("left");
+  const index_of_max_number = left_highlighter_select.length - 1;
+  return (left_or_right === "left") ? index_of_max_number - 1 : index_of_max_number; 
+}
+
+function get_min_highlighter_index(left_or_right)
+{
+  return (left_or_right === "left") ? 1 : 2; 
+}
+
 function cycle_highlighter()
 {
   console.log("Incrementing the highlighter");
@@ -45,8 +57,8 @@ function cycle_highlighter()
   let left = get_highlighter_select("left")
   let right = get_highlighter_select("right")
   
-  const right_max_index = right.length - 1;
-  const left_max_index = right_max_index - 1;
+  const right_max_index = get_max_highlighter_index("right");
+  const left_max_index = get_max_highlighter_index("left");
   
   function is_valid_left_index()
   {
@@ -88,10 +100,10 @@ function reverse_cycle_highlighter()
   let left = get_highlighter_select("left")
   let right = get_highlighter_select("right")
   
-  const right_max_index = right.length - 1;
-  const left_max_index = right_max_index - 1;
-  const right_min_index = 2;
-  const left_min_index = 1;
+  const right_max_index = get_max_highlighter_index("right");
+  const left_max_index = get_max_highlighter_index("left");
+  const right_min_index = get_min_highlighter_index("right");
+  const left_min_index = get_min_highlighter_index("left");
   
   function is_valid_left_index()
   {
@@ -131,7 +143,7 @@ function reset_highlighter_index()
 {
   console.log("Resetting the highlighter");
   
-  get_highlighter_select("left").selectedIndex = 1;
-  get_highlighter_select("right").selectedIndex = 2;
+  get_highlighter_select("left").selectedIndex = get_min_highlighter_index("left");
+  get_highlighter_select("right").selectedIndex = get_min_highlighter_index("right");
   highlightNumber();
 }
