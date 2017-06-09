@@ -1,5 +1,6 @@
-var CYCLE_HIGHLIGHTER_KEY_CODE = 70;
-var RESET_HIGHLIGHTER_KEY_CODE = 82;
+var REVERSE_CYCLE_HIGHLIGHTER_KEY_CODE = 68; //d
+var CYCLE_HIGHLIGHTER_KEY_CODE = 70; //f
+var RESET_HIGHLIGHTER_KEY_CODE = 82; //r
 
 if(!has_run_before)
 {
@@ -27,6 +28,10 @@ function key_up(event)
   {
     cycle_highlighter();
   }
+  else if(event.keyCode == REVERSE_CYCLE_HIGHLIGHTER_KEY_CODE)
+  {
+    reverse_cycle_highlighter();
+  }
   else if(event.keyCode == RESET_HIGHLIGHTER_KEY_CODE)
   {
     reset_highlighter_index();
@@ -40,7 +45,7 @@ function cycle_highlighter()
   let left = get_highlighter_select("left")
   let right = get_highlighter_select("right")
   
-  const right_max_index = left.length - 1;
+  const right_max_index = right.length - 1;
   const left_max_index = right_max_index - 1;
   
   function is_valid_left_index()
@@ -72,6 +77,52 @@ function cycle_highlighter()
       return;
     }
     right.selectedIndex = left.selectedIndex + 1;
+  }
+  highlightNumber();
+}
+
+function reverse_cycle_highlighter()
+{
+  console.log("Decrementing the highlighter");
+  
+  let left = get_highlighter_select("left")
+  let right = get_highlighter_select("right")
+  
+  const right_max_index = right.length - 1;
+  const left_max_index = right_max_index - 1;
+  const right_min_index = 2;
+  const left_min_index = 1;
+  
+  function is_valid_left_index()
+  {
+    return (1 <= left.selectedIndex) && (left.selectedIndex <= left_max_index);
+  }
+  
+  function is_valid_right_index()
+  {
+    return (1 <= right.selectedIndex) && (right.selectedIndex <= right_max_index);
+  }
+  
+  const right_is_greater_than_left = (right.selectedIndex > left.selectedIndex );
+  const need_to_reset_index = !is_valid_left_index() || !is_valid_right_index() || !right_is_greater_than_left;
+  if(need_to_reset_index)
+  {
+    reset_highlighter_index();
+    return;
+  }
+
+  right.selectedIndex--;
+  if(!is_valid_right_index() || right.selectedIndex == left.selectedIndex)
+  {
+    left.selectedIndex--;
+    if(!is_valid_left_index())
+    {
+      left.selectedIndex = left_max_index;
+      right.selectedIndex = right_max_index;
+      highlightNumber();
+      return;
+    }
+    right.selectedIndex = right_max_index;
   }
   highlightNumber();
 }
