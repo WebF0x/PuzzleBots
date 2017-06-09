@@ -10,6 +10,8 @@ if(!has_run_before)
   if(!has_run_before)
     document.addEventListener("keyup", key_up, false);
   has_run_before = true;
+  
+  reset_highlighter_index();
 })();
 
 function get_highlighter_select(left_or_right)
