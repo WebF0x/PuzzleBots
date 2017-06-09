@@ -54,21 +54,15 @@ function cycle_highlighter()
 {
   console.log("Incrementing the highlighter");
   
-  let left = get_highlighter_select("left")
-  let right = get_highlighter_select("right")
-  
-  const right_max_index = get_max_highlighter_index("right");
-  const left_max_index = get_max_highlighter_index("left");
-
-  const both_indexes_at_max = (left.selectedIndex == left_max_index) && (right.selectedIndex == right_max_index);
-  const right_is_greater_than_left = (right.selectedIndex > left.selectedIndex );
-  const need_to_reset_index = !is_valid_highlighter_index("left") || !is_valid_highlighter_index("right") || both_indexes_at_max || !right_is_greater_than_left;
-  if(need_to_reset_index)
+  if(!is_every_highlighter_indexes_valid())
   {
     reset_highlighter_index();
     return;
   }
 
+  let left = get_highlighter_select("left");
+  let right = get_highlighter_select("right");
+  
   right.selectedIndex++;
   if(!is_valid_highlighter_index("right"))
   {
@@ -86,22 +80,15 @@ function cycle_highlighter()
 function reverse_cycle_highlighter()
 {
   console.log("Decrementing the highlighter");
-  
-  let left = get_highlighter_select("left")
-  let right = get_highlighter_select("right")
-  
-  const right_max_index = get_max_highlighter_index("right");
-  const left_max_index = get_max_highlighter_index("left");
-  const right_min_index = get_min_highlighter_index("right");
-  const left_min_index = get_min_highlighter_index("left");
-  
-  const right_is_greater_than_left = (right.selectedIndex > left.selectedIndex );
-  const need_to_reset_index = !is_valid_highlighter_index("left") || !is_valid_highlighter_index("right") || !right_is_greater_than_left;
-  if(need_to_reset_index)
+
+  if(!is_every_highlighter_indexes_valid())
   {
     reset_highlighter_index();
     return;
   }
+  
+  let left = get_highlighter_select("left");
+  let right = get_highlighter_select("right");
 
   right.selectedIndex--;
   if(!is_valid_highlighter_index("right") || right.selectedIndex == left.selectedIndex)
@@ -109,12 +96,12 @@ function reverse_cycle_highlighter()
     left.selectedIndex--;
     if(!is_valid_highlighter_index("left"))
     {
-      left.selectedIndex = left_max_index;
-      right.selectedIndex = right_max_index;
+      left.selectedIndex = get_max_highlighter_index("left");
+      right.selectedIndex = get_max_highlighter_index("right");
       highlightNumber();
       return;
     }
-    right.selectedIndex = right_max_index;
+    right.selectedIndex = get_max_highlighter_index("right");
   }
   highlightNumber();
 }
@@ -125,6 +112,13 @@ function is_valid_highlighter_index(left_or_right)
   const min = get_min_highlighter_index(left_or_right);
   const max = get_max_highlighter_index(left_or_right);
   return (1 <= index) && (index <= max);
+}
+
+function is_every_highlighter_indexes_valid()
+{
+  const left_index = get_highlighter_select("left").selectedIndex;
+  const right_index = get_highlighter_select("right").selectedIndex;
+  return is_valid_highlighter_index("left") && is_valid_highlighter_index("right") && (right_index > left_index );
 }
 
 function reset_highlighter_index()
