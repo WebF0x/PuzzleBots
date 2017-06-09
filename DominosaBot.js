@@ -70,7 +70,6 @@ function cycle_highlighter()
     if(!is_valid_highlighter_index("left"))
     {
       reset_highlighter_index();
-      return;
     }
     right.selectedIndex = left.selectedIndex + 1;
   }
@@ -91,15 +90,13 @@ function reverse_cycle_highlighter()
   let right = get_highlighter_select("right");
 
   right.selectedIndex--;
-  if(!is_valid_highlighter_index("right") || right.selectedIndex == left.selectedIndex)
+  if(!is_valid_highlighter_index("right") || right.selectedIndex <= left.selectedIndex)
   {
     left.selectedIndex--;
     if(!is_valid_highlighter_index("left"))
     {
       left.selectedIndex = get_max_highlighter_index("left");
       right.selectedIndex = get_max_highlighter_index("right");
-      highlightNumber();
-      return;
     }
     right.selectedIndex = get_max_highlighter_index("right");
   }
@@ -111,7 +108,7 @@ function is_valid_highlighter_index(left_or_right)
   const index = get_highlighter_select(left_or_right).selectedIndex;
   const min = get_min_highlighter_index(left_or_right);
   const max = get_max_highlighter_index(left_or_right);
-  return (1 <= index) && (index <= max);
+  return (min <= index) && (index <= max);
 }
 
 function is_every_highlighter_indexes_valid()
