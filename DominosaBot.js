@@ -78,6 +78,8 @@ function cycle_highlighter()
 
 function reset_highlighter_index()
 {
+  console.log("Resetting the highlighter");
+  
   get_highlighter_select("left").selectedIndex = 1;
   get_highlighter_select("right").selectedIndex = 2;
   highlightNumber();
