@@ -1,4 +1,5 @@
 var CYCLE_HIGHLIGHTER_KEY_CODE = 70;
+var RESET_HIGHLIGHTER_KEY_CODE = 82;
 
 if(!has_run_before)
 {
@@ -25,6 +26,10 @@ function key_up(event)
   if(event.keyCode == CYCLE_HIGHLIGHTER_KEY_CODE)
   {
     cycle_highlighter();
+  }
+  else if(event.keyCode == RESET_HIGHLIGHTER_KEY_CODE)
+  {
+    reset_highlighter_index();
   } 
 }
 
