@@ -59,20 +59,10 @@ function cycle_highlighter()
   
   const right_max_index = get_max_highlighter_index("right");
   const left_max_index = get_max_highlighter_index("left");
-  
-  function is_valid_left_index()
-  {
-    return (1 <= left.selectedIndex) && (left.selectedIndex <= left_max_index);
-  }
-  
-  function is_valid_right_index()
-  {
-    return (1 <= right.selectedIndex) && (right.selectedIndex <= right_max_index);
-  }
 
   const both_indexes_at_max = (left.selectedIndex == left_max_index) && (right.selectedIndex == right_max_index);
   const right_is_greater_than_left = (right.selectedIndex > left.selectedIndex );
-  const need_to_reset_index = !is_valid_left_index() || !is_valid_right_index() || both_indexes_at_max || !right_is_greater_than_left;
+  const need_to_reset_index = !is_valid_highlighter_index("left") || !is_valid_highlighter_index("right") || both_indexes_at_max || !right_is_greater_than_left;
   if(need_to_reset_index)
   {
     reset_highlighter_index();
@@ -80,10 +70,10 @@ function cycle_highlighter()
   }
 
   right.selectedIndex++;
-  if(!is_valid_right_index())
+  if(!is_valid_highlighter_index("right"))
   {
     left.selectedIndex++;
-    if(!is_valid_left_index())
+    if(!is_valid_highlighter_index("left"))
     {
       reset_highlighter_index();
       return;
@@ -105,18 +95,8 @@ function reverse_cycle_highlighter()
   const right_min_index = get_min_highlighter_index("right");
   const left_min_index = get_min_highlighter_index("left");
   
-  function is_valid_left_index()
-  {
-    return (1 <= left.selectedIndex) && (left.selectedIndex <= left_max_index);
-  }
-  
-  function is_valid_right_index()
-  {
-    return (1 <= right.selectedIndex) && (right.selectedIndex <= right_max_index);
-  }
-  
   const right_is_greater_than_left = (right.selectedIndex > left.selectedIndex );
-  const need_to_reset_index = !is_valid_left_index() || !is_valid_right_index() || !right_is_greater_than_left;
+  const need_to_reset_index = !is_valid_highlighter_index("left") || !is_valid_highlighter_index("right") || !right_is_greater_than_left;
   if(need_to_reset_index)
   {
     reset_highlighter_index();
@@ -124,10 +104,10 @@ function reverse_cycle_highlighter()
   }
 
   right.selectedIndex--;
-  if(!is_valid_right_index() || right.selectedIndex == left.selectedIndex)
+  if(!is_valid_highlighter_index("right") || right.selectedIndex == left.selectedIndex)
   {
     left.selectedIndex--;
-    if(!is_valid_left_index())
+    if(!is_valid_highlighter_index("left"))
     {
       left.selectedIndex = left_max_index;
       right.selectedIndex = right_max_index;
@@ -137,6 +117,14 @@ function reverse_cycle_highlighter()
     right.selectedIndex = right_max_index;
   }
   highlightNumber();
+}
+
+function is_valid_highlighter_index(left_or_right)
+{
+  const index = get_highlighter_select(left_or_right).selectedIndex;
+  const min = get_min_highlighter_index(left_or_right);
+  const max = get_max_highlighter_index(left_or_right);
+  return (1 <= index) && (index <= max);
 }
 
 function reset_highlighter_index()
