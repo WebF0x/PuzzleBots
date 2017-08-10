@@ -136,3 +136,27 @@ function solve_unique_pair()
 {
   console.log("Solving unique pairs")
 }
+
+function get_html_board()
+{
+  return document.getElementById("DominosaTable")
+}
+
+function get_board(html_board)
+{
+  const html_tbody = html_board.getElementsByTagName("tbody")[0]
+  const html_rows = html_tbody.getElementsByTagName("tr")
+  let board = []
+  for(const html_row of html_rows)
+  {
+    const html_cells = html_row.getElementsByTagName("td")
+    let row = []
+    for(const html_cell of html_cells)
+    {
+      const number = parseInt(html_cell.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerText)
+      row.push(number)
+    }
+    board.push(row)
+  }
+  return board
+}
