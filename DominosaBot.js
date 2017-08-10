@@ -22,6 +22,7 @@ function run_all_tests()
 {
   test_get_number()
   test_get_neighbors_count()
+  test_get_neighbors()
   test_get_pairs_count()
   console.log("All tests passed")
 }
@@ -50,6 +51,30 @@ function test_get_neighbors_count()
   assert(2 == get_neighbors_count(board, 0, 0, 1))
   assert(3 == get_neighbors_count(board, 2, 2, 1))
   assert(4 == get_neighbors_count(board, 1, 1, 1))
+}
+
+function test_get_neighbors()
+{
+  const board = [
+    [0, 1, 2, 0],
+    [1, 0, 1, 1],
+    [1, 1, 0, 1]
+  ]
+  assert(get_neighbors(board, 0, 0, 9).length == 0)
+
+  assert(array_contains(get_neighbors(board, 3, 0, 1), [3, 1]))
+
+  assert(array_contains(get_neighbors(board, 0, 0, 1), [0, 1]))
+  assert(array_contains(get_neighbors(board, 0, 0, 1), [1, 0]))
+
+  assert(array_contains(get_neighbors(board, 2, 2, 1), [1, 2]))
+  assert(array_contains(get_neighbors(board, 2, 2, 1), [2, 1]))
+  assert(array_contains(get_neighbors(board, 2, 2, 1), [3, 2]))
+
+  assert(array_contains(get_neighbors(board, 1, 1, 1), [1, 0]))
+  assert(array_contains(get_neighbors(board, 1, 1, 1), [0, 1]))
+  assert(array_contains(get_neighbors(board, 1, 1, 1), [1, 2]))
+  assert(array_contains(get_neighbors(board, 1, 1, 1), [2, 1]))
 }
 
 function test_get_pairs_count()
@@ -245,16 +270,21 @@ function get_pairs_count(board, a, b)
 
 function get_neighbors_count(board, x, y, b)
 {
+  return get_neighbors(board, x, y, b).length
+}
+
+function get_neighbors(board, x, y, b)
+{
   const min_x = 0
   const min_y = 0
   const max_x = board.length
   const max_y = board.length - 1
-  let count = 0
-  if (x > min_x && get_number(board, x - 1, y) == b) count++
-  if (x < max_x && get_number(board, x + 1, y) == b) count++
-  if (y > min_y && get_number(board, x, y - 1) == b) count++
-  if (y < max_y && get_number(board, x, y + 1) == b) count++
-  return count
+  let neighbors = []
+  if (x > min_x && get_number(board, x - 1, y) == b) neighbors.push([x - 1, y])
+  if (x < max_x && get_number(board, x + 1, y) == b) neighbors.push([x + 1, y])
+  if (y > min_y && get_number(board, x, y - 1) == b) neighbors.push([x, y - 1])
+  if (y < max_y && get_number(board, x, y + 1) == b) neighbors.push([x, y + 1])
+  return neighbors
 }
 
 function get_number(board, x, y)
@@ -303,4 +333,48 @@ function assert(condition, message)
   {
     alert(message)
   }
+}
+
+function are_arrays_equal(array1, array2)
+{
+  if(!array1 || !array2)
+  {
+    return false;
+  }
+
+  if(array1.length != array2.length)
+  {
+    return false;
+  }
+
+  for(let i = 0; i<array1.length; i++) 
+  {
+    // Check if we have nested arrays
+    if(array1[i] instanceof Array && array2[i] instanceof Array) 
+    {
+      // recurse into the nested arrays
+      if(!are_arrays_equal(array1[i], array2[i]))
+      {
+        return false;
+      }
+    }
+    else if(array1[i] != array2[i])
+    {
+      // Warning - two different object instances will never be equal: {x:20} != {x:20}
+      return false;
+    }
+  }
+  return true;
+}
+
+function array_contains(array, element)
+{
+  for(const array_element of array)
+  {
+    if(are_arrays_equal(array_element, element))
+    {
+      return true;
+    }
+  }
+  return false;
 }
