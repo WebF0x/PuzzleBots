@@ -1,6 +1,7 @@
 var REVERSE_CYCLE_HIGHLIGHTER_KEY_CODE = 68; //d
 var CYCLE_HIGHLIGHTER_KEY_CODE = 70; //f
 var RESET_HIGHLIGHTER_KEY_CODE = 82; //r
+var SOLVE_UNIQUE_PAIRS_KEY_CODE = 83; //s
 
 if(!has_run_before)
 {
@@ -35,6 +36,10 @@ function key_up(event)
   else if(event.keyCode == RESET_HIGHLIGHTER_KEY_CODE)
   {
     reset_highlighter_index();
+  }
+  else if(event.keyCode == SOLVE_UNIQUE_PAIRS_KEY_CODE)
+  {
+    solve_unique_pair();
   } 
 }
 
@@ -125,4 +130,9 @@ function reset_highlighter_index()
   get_highlighter_select("left").selectedIndex = get_min_highlighter_index("left");
   get_highlighter_select("right").selectedIndex = get_min_highlighter_index("right");
   highlightNumber();
+}
+
+function solve_unique_pair()
+{
+  console.log("Solving unique pairs");
 }
