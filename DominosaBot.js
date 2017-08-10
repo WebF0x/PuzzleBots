@@ -20,11 +20,20 @@ if(!has_run_before)
 
 function run_all_tests()
 {
+  test_sort_pair()
   test_get_number()
   test_get_neighbors_count()
   test_get_neighbors()
   test_get_pairs_count()
+  test_get_pairs()
   console.log("All tests passed")
+}
+
+function test_sort_pair()
+{
+  assert(are_arrays_equal(sort_pair([1, 4, 2, 4]), [1, 4, 2, 4]))
+  assert(are_arrays_equal(sort_pair([2, 4, 1, 4]), [1, 4, 2, 4]))
+  assert(are_arrays_equal(sort_pair([1, 2, 1, 3]), [1, 2, 1, 3]))
 }
 
 function test_get_number()
@@ -114,6 +123,61 @@ function test_get_pairs_count()
   assert(1 == get_pairs_count(board_1_pairs_of_1_1, 1, 1))
   assert(2 == get_pairs_count(board_2_pairs_of_1_1, 1, 1))
   assert(4 == get_pairs_count(board_4_pairs_of_1_1, 1, 1))
+}
+
+function test_get_pairs()
+{
+  const board_0_pairs_of_0_1 = [
+    [0, 2],
+    [2, 0]
+  ]
+  const board_1_pairs_of_0_1 = [
+    [0, 1],
+    [0, 2]
+  ]
+  const board_2_pairs_of_0_1 = [
+    [0, 1],
+    [0, 0]
+  ]
+  const board_0_pairs_of_1_1 = [
+    [0, 1],
+    [2, 3]
+  ]
+  const board_1_pairs_of_1_1 = [
+    [0, 1],
+    [2, 1]
+  ]
+  const board_2_pairs_of_1_1 = [
+    [0, 1],
+    [1, 1]
+  ]
+  const board_4_pairs_of_1_1 = [
+    [1, 1],
+    [1, 1]
+  ]
+  assert(get_pairs(board_0_pairs_of_0_1, 0, 1).length == 0)
+
+  assert(get_pairs(board_1_pairs_of_0_1, 0, 1).length == 1)
+  assert(array_contains(get_pairs(board_1_pairs_of_0_1, 0, 1), [0, 0, 1, 0]))
+
+  assert(get_pairs(board_2_pairs_of_0_1, 0, 1).length == 2)
+  assert(array_contains(get_pairs(board_2_pairs_of_0_1, 0, 1), [0, 0, 1, 0]))
+  assert(array_contains(get_pairs(board_2_pairs_of_0_1, 0, 1), [1, 0, 1, 1]))
+
+  assert(get_pairs(board_0_pairs_of_1_1, 1, 1).length == 0)
+
+  assert(get_pairs(board_1_pairs_of_1_1, 1, 1).length == 1)
+  assert(array_contains(get_pairs(board_1_pairs_of_1_1, 1, 1), [1, 0, 1, 1]))
+
+  assert(get_pairs(board_2_pairs_of_1_1, 1, 1).length == 2)
+  assert(array_contains(get_pairs(board_2_pairs_of_1_1, 1, 1), [1, 0, 1, 1]))
+  assert(array_contains(get_pairs(board_2_pairs_of_1_1, 1, 1), [0, 1, 1, 1]))
+
+  assert(get_pairs(board_4_pairs_of_1_1, 1, 1).length == 4)
+  assert(array_contains(get_pairs(board_4_pairs_of_1_1, 1, 1), [0, 0, 0, 1]))
+  assert(array_contains(get_pairs(board_4_pairs_of_1_1, 1, 1), [0, 0, 1, 0]))
+  assert(array_contains(get_pairs(board_4_pairs_of_1_1, 1, 1), [0, 1, 1, 1]))
+  assert(array_contains(get_pairs(board_4_pairs_of_1_1, 1, 1), [1, 0, 1, 1]))
 }
 
 function get_highlighter_select(left_or_right)
@@ -248,7 +312,12 @@ function solve_unique_pair()
 
 function get_pairs_count(board, a, b)
 {
-  let count = 0
+  return get_pairs(board, a, b).length
+}
+
+function get_pairs(board, a, b)
+{
+  let pairs = []
   for(let y = 0; y < board.length; y++)
   {
     const row = board[y]
@@ -257,15 +326,29 @@ function get_pairs_count(board, a, b)
       const number = get_number(board, x, y)
       if(number == a)
       {
-        count += get_neighbors_count(board, x, y, b)
+        const neighbors = get_neighbors(board, x, y, b)
+        for(neighbor of neighbors)
+        {
+          const x2 = neighbor[0]
+          const y2 = neighbor[1]
+          const pair = [x, y, x2, y2]
+          add_to_array_if_unique(pairs, sort_pair(pair))
+        }
       }
     }
   }
-  if(a == b)
-  {
-    count /= 2
-  }
-  return count
+  return pairs
+}
+
+function sort_pair(pair)
+{
+  const x1 = pair[0]
+  const y1 = pair[1]
+  const x2 = pair[2]
+  const y2 = pair[3]
+  if(x1 < x2) return [x1, y1, x2, y2]
+  if(x1 == x2 && y1 <= y2) return [x1, y1, x2, y2]
+  return [x2, y2, x1, y1]
 }
 
 function get_neighbors_count(board, x, y, b)
@@ -377,4 +460,12 @@ function array_contains(array, element)
     }
   }
   return false;
+}
+
+function add_to_array_if_unique(array, element)
+{
+  if(!array_contains(array, element))
+  {
+    array.push(element);
+  }
 }
