@@ -21,6 +21,7 @@ if(!has_run_before)
 function run_all_tests()
 {
   test_get_number()
+  test_get_neighbors_count()
   console.log("All tests passed")
 }
 
@@ -34,6 +35,20 @@ function test_get_number()
   assert(2 == get_number(board, 1, 0))
   assert(3 == get_number(board, 0, 1))
   assert(4 == get_number(board, 1, 1))
+}
+
+function test_get_neighbors_count()
+{
+  const board = [
+    [0, 1, 2, 0],
+    [1, 0, 1, 1],
+    [1, 1, 0, 1]
+  ]
+  assert(0 == get_neighbors_count(board, 0, 0, 9))
+  assert(1 == get_neighbors_count(board, 3, 0, 1))
+  assert(2 == get_neighbors_count(board, 0, 0, 1))
+  assert(3 == get_neighbors_count(board, 2, 2, 1))
+  assert(4 == get_neighbors_count(board, 1, 1, 1))
 }
 
 function get_highlighter_select(left_or_right)
@@ -164,6 +179,20 @@ function reset_highlighter_index()
 function solve_unique_pair()
 {
   console.log("Solving unique pairs")
+}
+
+function get_neighbors_count(board, x, y, b)
+{
+  const min_x = 0
+  const min_y = 0
+  const max_x = board.length
+  const max_y = board.length - 1
+  let count = 0
+  if (x > min_x && get_number(board, x - 1, y) == b) count++
+  if (x < max_x && get_number(board, x + 1, y) == b) count++
+  if (y > min_y && get_number(board, x, y - 1) == b) count++
+  if (y < max_y && get_number(board, x, y + 1) == b) count++
+  return count
 }
 
 function get_number(board, x, y)
