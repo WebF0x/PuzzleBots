@@ -10,12 +10,31 @@ if(!has_run_before)
 
 (function main()
 {
+  run_all_tests()
   if(!has_run_before)
     document.addEventListener("keyup", key_up, false)
   has_run_before = true
   
   reset_highlighter_index()
 })()
+
+function run_all_tests()
+{
+  test_get_number()
+  console.log("All tests passed")
+}
+
+function test_get_number()
+{
+  const board = [
+    [1, 2],
+    [3, 4]
+  ]
+  assert(1 == get_number(board, 0, 0))
+  assert(2 == get_number(board, 1, 0))
+  assert(3 == get_number(board, 0, 1))
+  assert(4 == get_number(board, 1, 1))
+}
 
 function get_highlighter_select(left_or_right)
 {
@@ -147,6 +166,11 @@ function solve_unique_pair()
   console.log("Solving unique pairs")
 }
 
+function get_number(board, x, y)
+{
+  return board[y][x]
+}
+
 function get_html_board()
 {
   return document.getElementById("DominosaTable")
@@ -176,4 +200,16 @@ function place_domino(x1, y1, x2, y2)
   placeHelper(x1, y1, x2, y2)
   removeHelper()
   placePiece()
+}
+
+/////////////
+// Utility //
+/////////////
+
+function assert(condition, message)
+{
+  if(!condition)
+  {
+    alert(message)
+  }
 }
