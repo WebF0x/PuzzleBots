@@ -19,9 +19,7 @@ function run_all_tests()
 {
   test_sort_pair()
   test_get_number()
-  test_get_neighbors_count()
   test_get_neighbors()
-  test_get_pairs_count()
   test_get_pairs()
   test_get_unique_pairs()
   console.log("All tests passed")
@@ -46,20 +44,6 @@ function test_get_number()
   assert(4 == get_number(board, 1, 1))
 }
 
-function test_get_neighbors_count()
-{
-  const board = [
-    [0, 1, 2, 0],
-    [1, 0, 1, 1],
-    [1, 1, 0, 1]
-  ]
-  assert(0 == get_neighbors_count(board, 0, 0, 9))
-  assert(1 == get_neighbors_count(board, 3, 0, 1))
-  assert(2 == get_neighbors_count(board, 0, 0, 1))
-  assert(3 == get_neighbors_count(board, 2, 2, 1))
-  assert(4 == get_neighbors_count(board, 1, 1, 1))
-}
-
 function test_get_neighbors()
 {
   const board = [
@@ -82,45 +66,6 @@ function test_get_neighbors()
   assert(array_contains(get_neighbors(board, 1, 1, 1), [0, 1]))
   assert(array_contains(get_neighbors(board, 1, 1, 1), [1, 2]))
   assert(array_contains(get_neighbors(board, 1, 1, 1), [2, 1]))
-}
-
-function test_get_pairs_count()
-{
-  const board_0_pairs_of_0_1 = [
-    [0, 2],
-    [2, 0]
-  ]
-  const board_1_pairs_of_0_1 = [
-    [0, 1],
-    [0, 2]
-  ]
-  const board_2_pairs_of_0_1 = [
-    [0, 1],
-    [0, 0]
-  ]
-  const board_0_pairs_of_1_1 = [
-    [0, 1],
-    [2, 3]
-  ]
-  const board_1_pairs_of_1_1 = [
-    [0, 1],
-    [2, 1]
-  ]
-  const board_2_pairs_of_1_1 = [
-    [0, 1],
-    [1, 1]
-  ]
-  const board_4_pairs_of_1_1 = [
-    [1, 1],
-    [1, 1]
-  ]
-  assert(0 == get_pairs_count(board_0_pairs_of_0_1, 0, 1))
-  assert(1 == get_pairs_count(board_1_pairs_of_0_1, 0, 1))
-  assert(2 == get_pairs_count(board_2_pairs_of_0_1, 0, 1))
-  assert(0 == get_pairs_count(board_0_pairs_of_1_1, 1, 1))
-  assert(1 == get_pairs_count(board_1_pairs_of_1_1, 1, 1))
-  assert(2 == get_pairs_count(board_2_pairs_of_1_1, 1, 1))
-  assert(4 == get_pairs_count(board_4_pairs_of_1_1, 1, 1))
 }
 
 function test_get_pairs()
