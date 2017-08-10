@@ -55,6 +55,16 @@ function get_min_highlighter_index(left_or_right)
   return (left_or_right === "left") ? 1 : 2 
 }
 
+function get_min_number(board)
+{
+  return 0
+}
+
+function get_max_number(board)
+{
+  return board.length- 1
+}
+
 function cycle_highlighter()
 {
   console.log("Incrementing the highlighter")
