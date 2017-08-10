@@ -26,6 +26,7 @@ function run_all_tests()
   test_get_neighbors()
   test_get_pairs_count()
   test_get_pairs()
+  test_get_unique_pairs()
   console.log("All tests passed")
 }
 
@@ -180,6 +181,27 @@ function test_get_pairs()
   assert(array_contains(get_pairs(board_4_pairs_of_1_1, 1, 1), [1, 0, 1, 1]))
 }
 
+function test_get_unique_pairs(board)
+{
+  const board_only_duplicate_pairs = [
+    [0, 1],
+    [1, 0]
+  ]
+
+  const board_4_unique_pairs = [
+    [1, 2],
+    [3, 4]
+  ]
+
+  assert(get_unique_pairs(board_only_duplicate_pairs).length == 0)
+
+  assert(get_unique_pairs(board_4_unique_pairs).length == 4)
+  assert(array_contains(get_unique_pairs(board_4_unique_pairs, 1, 1), [0, 0, 0, 1]))
+  assert(array_contains(get_unique_pairs(board_4_unique_pairs, 1, 1), [0, 0, 1, 0]))
+  assert(array_contains(get_unique_pairs(board_4_unique_pairs, 1, 1), [0, 1, 1, 1]))
+  assert(array_contains(get_unique_pairs(board_4_unique_pairs, 1, 1), [1, 0, 1, 1]))
+}
+
 function get_highlighter_select(left_or_right)
 {
   let name = (left_or_right === "left") ? "selectNumber" : "selectNumberG"
@@ -225,7 +247,15 @@ function get_min_number(board)
 
 function get_max_number(board)
 {
-  return board.length- 1
+  let max_number = 0
+  for(row of board)
+  {
+    for(number of row)
+    {
+      max_number = Math.max(number, max_number)
+    }
+  }
+  return max_number
 }
 
 function cycle_highlighter()
@@ -308,6 +338,16 @@ function reset_highlighter_index()
 function solve_unique_pair()
 {
   console.log("Solving unique pairs")
+  const board = get_board(get_html_board())
+  const unique_pairs = get_unique_pairs(board)
+  for(unique_pair of unique_pairs)
+  {
+    const x1 = unique_pair[0]
+    const y1 = unique_pair[1]
+    const x2 = unique_pair[2]
+    const y2 = unique_pair[3]
+    place_domino(x1, y1, x2, y2)
+  }
 }
 
 function get_pairs_count(board, a, b)
@@ -338,6 +378,25 @@ function get_pairs(board, a, b)
     }
   }
   return pairs
+}
+
+function get_unique_pairs(board)
+{
+  let unique_pairs = []
+  const max_number = get_max_number(board)
+  for(let i = 0; i <= max_number; i++)
+  {
+    for(let j = i; j <= max_number; j++)
+    {
+      const pairs = get_pairs(board, i, j)
+      if(pairs.length == 1)
+      {
+        const unique_pair = pairs[0]
+        unique_pairs.push(unique_pair)
+      }
+    }
+  }
+  return unique_pairs
 }
 
 function sort_pair(pair)
@@ -401,6 +460,7 @@ function get_board(html_board)
 
 function place_domino(x1, y1, x2, y2)
 {
+  console.log("Placing domino on: ", x1, y1, x2, y2)
   placeHelper(x1, y1, x2, y2)
   removeHelper()
   placePiece()
