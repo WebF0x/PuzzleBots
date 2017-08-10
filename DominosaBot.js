@@ -160,3 +160,10 @@ function get_board(html_board)
   }
   return board
 }
+
+function place_domino(x1, y1, x2, y2)
+{
+  placeHelper(x1, y1, x2, y2)
+  removeHelper()
+  placePiece()
+}
