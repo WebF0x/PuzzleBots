@@ -22,6 +22,7 @@ function run_all_tests()
 {
   test_get_number()
   test_get_neighbors_count()
+  test_get_pairs_count()
   console.log("All tests passed")
 }
 
@@ -49,6 +50,45 @@ function test_get_neighbors_count()
   assert(2 == get_neighbors_count(board, 0, 0, 1))
   assert(3 == get_neighbors_count(board, 2, 2, 1))
   assert(4 == get_neighbors_count(board, 1, 1, 1))
+}
+
+function test_get_pairs_count()
+{
+  const board_0_pairs_of_0_1 = [
+    [0, 2],
+    [2, 0]
+  ]
+  const board_1_pairs_of_0_1 = [
+    [0, 1],
+    [0, 2]
+  ]
+  const board_2_pairs_of_0_1 = [
+    [0, 1],
+    [0, 0]
+  ]
+  const board_0_pairs_of_1_1 = [
+    [0, 1],
+    [2, 3]
+  ]
+  const board_1_pairs_of_1_1 = [
+    [0, 1],
+    [2, 1]
+  ]
+  const board_2_pairs_of_1_1 = [
+    [0, 1],
+    [1, 1]
+  ]
+  const board_4_pairs_of_1_1 = [
+    [1, 1],
+    [1, 1]
+  ]
+  assert(0 == get_pairs_count(board_0_pairs_of_0_1, 0, 1))
+  assert(1 == get_pairs_count(board_1_pairs_of_0_1, 0, 1))
+  assert(2 == get_pairs_count(board_2_pairs_of_0_1, 0, 1))
+  assert(0 == get_pairs_count(board_0_pairs_of_1_1, 1, 1))
+  assert(1 == get_pairs_count(board_1_pairs_of_1_1, 1, 1))
+  assert(2 == get_pairs_count(board_2_pairs_of_1_1, 1, 1))
+  assert(4 == get_pairs_count(board_4_pairs_of_1_1, 1, 1))
 }
 
 function get_highlighter_select(left_or_right)
@@ -179,6 +219,28 @@ function reset_highlighter_index()
 function solve_unique_pair()
 {
   console.log("Solving unique pairs")
+}
+
+function get_pairs_count(board, a, b)
+{
+  let count = 0
+  for(let y = 0; y < board.length; y++)
+  {
+    const row = board[y]
+    for(let x = 0; x < row.length; x++)
+    {
+      const number = get_number(board, x, y)
+      if(number == a)
+      {
+        count += get_neighbors_count(board, x, y, b)
+      }
+    }
+  }
+  if(a == b)
+  {
+    count /= 2
+  }
+  return count
 }
 
 function get_neighbors_count(board, x, y, b)
