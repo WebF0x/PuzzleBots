@@ -5,17 +5,14 @@ var SOLVE_UNIQUE_PAIRS_KEY_CODE = 83 //s
 
 if(!has_run_before)
 {
-  var has_run_before = false
+  document.addEventListener("keyup", key_up, false)
+  reset_highlighter_index()
+  var has_run_before = true
 }
 
 (function main()
-{
-  run_all_tests()
-  if(!has_run_before)
-    document.addEventListener("keyup", key_up, false)
-  has_run_before = true
-  
-  reset_highlighter_index()
+{  
+  run_all_tests()  
 })()
 
 function run_all_tests()
