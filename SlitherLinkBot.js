@@ -18,10 +18,44 @@ var Board = class Board
   constructor(board_rows)
   {
     this.rows = board_rows;
+    this.height = this.rows.length
+    this.width = this.rows[0].length
   }
   get_cell(x, y)
   {
     return this.rows[y][x]
+  }
+  set_bottom_line(x, y, is_line_drawn)
+  {
+    this.get_cell(x, y).bottom_line = is_line_drawn
+    if (y < this.height - 1)
+    {
+      this.get_cell(x, y + 1).top_line = is_line_drawn
+    }
+  }
+  set_top_line(x, y, is_line_drawn)
+  {
+    this.get_cell(x, y).top_line = is_line_drawn
+    if (y > 0)
+    {
+      this.get_cell(x, y - 1).bottom_line = is_line_drawn
+    }
+  }
+  set_right_line(x, y, is_line_drawn)
+  {
+    this.get_cell(x, y).right_line = is_line_drawn
+    if (x < this.width - 1)
+    {
+      this.get_cell(x + 1, y).left_line = is_line_drawn
+    }
+  }
+  set_left_line(x, y, is_line_drawn)
+  {
+    this.get_cell(x, y).left_line = is_line_drawn
+    if (x > 0)
+    {
+      this.get_cell(x - 1, y).right_line = is_line_drawn
+    }
   }
 }
 
@@ -39,6 +73,8 @@ if(!has_run_before)
 function run_all_tests()
 {
   test_get_cell()
+  test_set_lines_on_extremities()
+  test_setting_a_cells_line_also_updates_the_implicated_neighbor()
   console.log("All tests passed")
 }
 
@@ -51,6 +87,39 @@ function test_get_cell()
   assert(board.get_cell(1, 0) == "top_right", "Should return the top right cell")
   assert(board.get_cell(0, 1) == "bottom_left", "Should return the bottom left cell")
   assert(board.get_cell(1, 1) == "bottom_right", "Should return the bottom right cell")
+}
+
+function test_set_lines_on_extremities()
+{
+  const unique_cell = new BoardCell(1, false, false, false, false)
+  const board = new Board([[unique_cell]])
+  board.set_top_line(0, 0, true)
+  assert(board.get_cell(0, 0).top_line == true, "Top line should be set")
+  board.set_bottom_line(0, 0, true)
+  assert(board.get_cell(0, 0).bottom_line == true, "Bottom line should be set")
+  board.set_right_line(0, 0, true)
+  assert(board.get_cell(0, 0).right_line == true, "Right line should be set")
+  board.set_left_line(0, 0, true)
+  assert(board.get_cell(0, 0).left_line == true, "Left line should be set")
+}
+
+function test_setting_a_cells_line_also_updates_the_implicated_neighbor()
+{
+  const top_left = new BoardCell(1, false, false, false, false)
+  const top_right = new BoardCell(2, false, false, false, false)
+  const bottom_left = new BoardCell(3, false, false, false, false)
+  const bottom_right = new BoardCell(4, false, false, false, false)
+  const top_row = [top_left, top_right]
+  const bottom_row = [bottom_left, bottom_right]
+  const board = new Board([top_row, bottom_row])
+  board.set_bottom_line(0, 0, true)
+  assert(board.get_cell(0, 1).top_line == true, "Top line should be updated when setting the above cell's bottom line")
+  board.set_top_line(0, 1, false)
+  assert(board.get_cell(0, 0).bottom_line == false, "Bottom line should be updated when setting the below cell's top line")
+  board.set_right_line(0, 0, true)
+  assert(board.get_cell(1, 0).left_line == true, "Left line should be updated when setting the left cell's right line")
+  board.set_left_line(1, 0, false)
+  assert(board.get_cell(0, 0).right_line == false, "Right line should be updated when setting the right cell's left line")
 }
 
 function key_up(event)
