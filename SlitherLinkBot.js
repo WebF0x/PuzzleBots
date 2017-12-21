@@ -13,6 +13,18 @@ var BoardCell = class BoardCell
   }
 }
 
+var Board = class Board
+{
+  constructor(board_rows)
+  {
+    this.rows = board_rows;
+  }
+  get_cell(x, y)
+  {
+    return this.rows[y][x]
+  }
+}
+
 if(!has_run_before)
 {
   document.addEventListener("keyup", key_up, false)
@@ -26,7 +38,19 @@ if(!has_run_before)
 
 function run_all_tests()
 {
+  test_get_cell()
   console.log("All tests passed")
+}
+
+function test_get_cell()
+{
+  const top_row = ["top_left", "top_right"]
+  const bottom_row = ["bottom_left", "bottom_right"]
+  const board = new Board([top_row, bottom_row])
+  assert(board.get_cell(0, 0) == "top_left", "Should return the top left cell")
+  assert(board.get_cell(1, 0) == "top_right", "Should return the top right cell")
+  assert(board.get_cell(0, 1) == "bottom_left", "Should return the bottom left cell")
+  assert(board.get_cell(1, 1) == "bottom_right", "Should return the bottom right cell")
 }
 
 function key_up(event)
