@@ -42,6 +42,38 @@ function get_board(html_board)
   return board
 }
 
+function set_skyscraper(x, y, height)
+{
+  $this.setCurrentCell({row:y, col:x})
+  $this.setNumber(height)
+}
+
+function get_viewed_skyscrapers_html()
+{
+  let htmlTaskElements = Array.from(document.getElementsByClassName('task'))
+  return htmlTaskElements.map(element => parseInt(element.textContent))
+}
+
+function get_viewed_skyscrapers_downwards()
+{
+  return get_viewed_skyscrapers_html().filter((_,i) => i % $this.puzzleWH == 0)
+}
+
+function get_viewed_skyscrapers_upwards()
+{
+  return get_viewed_skyscrapers_html().filter((_,i) => i % $this.puzzleWH == 1)
+}
+
+function get_viewed_skyscrapers_rightwards()
+{
+  return get_viewed_skyscrapers_html().filter((_,i) => i % $this.puzzleWH == 2)
+}
+
+function get_viewed_skyscrapers_leftwards()
+{
+  return get_viewed_skyscrapers_html().filter((_,i) => i % $this.puzzleWH == 3)
+}
+
 /////////////
 // Utility //
 /////////////
